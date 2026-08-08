@@ -66,6 +66,9 @@ const RESERVED_TYPES = [
 // 候选图标为全部物品的机型（协议核心 / 仓库取货口）
 const ALL_ITEM_TYPES = ["protocol_core_1", "warehouse_output_1"];
 
+// pi 输入端口固定附加项：气态息壤（用于激活机器）
+const PI_FIXED_ITEM = "gas_xiranite";
+
 // 当前展开配置的端口（默认第一个，即 po1 / bo1 ...）
 const activePortKey = ref(null);
 
@@ -101,16 +104,23 @@ function portType(key) {
   return key.startsWith("pi") ? "pi" : "bo";
 }
 
-/** 某端口的候选图标：特殊机型为全部物品；pi(输入)取配方输入物；其余取配方输出物 */
+/** 是否为流体（gas_/liquid_ 前缀） */
+function isFluid(id) {
+  return id.startsWith("gas_") || id.startsWith("liquid_");
+}
+
+/** 某端口的候选图标：特殊机型为全部物品；pi(输入)取流体输入+气态息壤；其余取流体输出 */
 function portCandidatesFor(key) {
   if (ALL_ITEM_TYPES.includes(props.machine.type)) {
     return Object.keys(resourcesStore.items);
   }
   const recipe = currentRecipe.value;
   if (!recipe) return [];
-  return portType(key) === "pi"
-    ? Object.keys(recipe.in || {})
-    : Object.keys(recipe.out || {});
+  if (portType(key) === "pi") {
+    const ids = Object.keys(recipe.in || {}).filter(isFluid);
+    return ids.includes(PI_FIXED_ITEM) ? ids : [PI_FIXED_ITEM, ...ids];
+  }
+  return Object.keys(recipe.out || {}).filter(isFluid);
 }
 
 /** 活动端口的候选图标 */
