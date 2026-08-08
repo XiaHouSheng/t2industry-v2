@@ -7,8 +7,8 @@ export const useStorageStore = defineStore(
     // 场景配置
     const width = ref(1600);
     const height = ref(800);
-    const gridLineColor = ref("black");
-    const backgroundColor = ref("#89CFF0");
+    const gridLineColor = ref("white");
+    const backgroundColor = ref("#A3A3A3");
     const backgroundAlpha = ref(0.5);
     const rowCount = ref(50);
     const colCount = ref(50);
