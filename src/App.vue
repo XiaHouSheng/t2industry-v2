@@ -1,7 +1,7 @@
 <script setup>
-import SimCanvas from "@/components/SimCanvas.vue";
+import EditorShell from "@/components/editor/EditorShell.vue";
 </script>
 
 <template>
-    <SimCanvas />
+  <EditorShell />
 </template>

@@ -137,3 +137,12 @@ export {
   clearBlueprint,
 } from "../core_blueprint/BlueprintStage.js";
 
+// 资源加载（应用挂载前调用）
+export { initLoader } from "../core_loader/index.js";
+
+// 舞台初始化（画布宿主组件使用）
+export { app } from "../core_stage/SimStage.js";
+export { drawGridLines, drawHitArea } from "../core_stage/SimInit.js";
+export { resetPosition, resetScale } from "../core_stage/ScaleStage.js";
+export { initIndicator } from "../core_sub/Indicator.js";
+

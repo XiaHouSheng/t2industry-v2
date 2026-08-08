@@ -206,8 +206,11 @@ class MachineContainer extends Container {
       icon.x = this.machineWidth / 2;
       icon.y = this.machineHeight / 2;
       icon.alpha = 0.6;
-      icon.width = this.machineWidth * 0.8;
-      icon.height = this.machineHeight * 0.8;
+      const iconScale = Math.min(
+        (this.machineWidth * 0.8) / iconTex.width,
+        (this.machineHeight * 0.8) / iconTex.height,
+      );
+      icon.scale.set(iconScale);
       this.backgroundContainer.addChild(icon);
     }
     this.addChildAt(this.backgroundContainer, 0);

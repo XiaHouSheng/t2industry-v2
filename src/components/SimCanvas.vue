@@ -1,18 +1,28 @@
 <script setup>
+/**
+ * SimCanvas.vue — 引擎舞台的宿主容器
+ *
+ * 只负责 Pixi 应用的挂载/销毁与键盘监听注册，
+ * 所有引擎能力均从门面 api.js 导入，保持 UI 与引擎内部实现解耦。
+ */
 import { ref, onMounted, onUnmounted } from "vue";
-import { app } from "@/engine/core_stage/SimStage.js";
-import { useStorageStore } from "@/engine/stores/StorageStore.js";
 import {
+  app,
+  useStorageStore,
+  drawGridLines,
+  drawHitArea,
+  initIndicator,
+  resetPosition,
+  resetScale,
+  initStoreBlueprint,
   handleKeyboard,
   handleKeyboardForZoom,
   handleKeyboardUp,
-} from "@/engine/core_middleware/KeyboardHandle.js";
-import { drawGridLines, drawHitArea } from "@/engine/core_stage/SimInit.js";
-import { resetPosition, resetScale } from "@/engine/core_stage/ScaleStage.js";
-import { initIndicator } from "@/engine/core_sub/Indicator.js";
+} from "@/engine/plugin/api.js";
 
 const storageStore = useStorageStore();
 const canvas = ref(null);
+
 (async () => {
   globalThis.__PIXI_APP__ = app;
   drawGridLines();
@@ -42,9 +52,18 @@ onUnmounted(() => {
   app.destroy();
   window.removeEventListener("keydown", handleKeyboard);
   window.removeEventListener("keydown", handleKeyboardForZoom);
+  window.removeEventListener("keyup", handleKeyboardUp);
 });
 </script>
 
 <template>
-  <div ref="canvas"></div>
+  <div ref="canvas" class="sim-canvas"></div>
 </template>
+
+<style scoped>
+.sim-canvas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
