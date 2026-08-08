@@ -1,0 +1,308 @@
+import { useStorageStore } from "../stores/StorageStore.js";
+import {
+  placeMachine,
+} from "../core_sub/Machine.js";
+import {
+  placeBelt,
+} from "../core_sub/Belt.js";
+import {
+  placePipe,
+} from "../core_sub/Pipe.js";
+import {
+  drawMask,
+  drawSelectBox,
+  drawConflictMaskOnMove,
+  drawHoverIndicator,
+} from "../core_stage/IndicatorStage.js";
+import {
+  detectOnMoveMask,
+  detectOnHoverMachine,
+  detectOnHoverBelt,
+  detectOnHoverPipe,
+} from "./ConflictDetect.js";
+import { pixelToGridNoneOffset } from "./PositionConvert.js";
+// === 状态 ===
+const S = {
+  pipeOrBeltMode: true,
+  isSelectMoving: false,
+  is_select_copy: false,
+  nowPlaceIsBelt: true,
+
+  placeIndicator: null,
+  selectIndicator: null,
+  hoverIndicator: null,
+
+  indicatorGraphics: [],
+  conflictGraphics: [],
+
+  selectGraphics: { machines: {}, belts: {}, pipes: {} },
+  metaBackup: { machines: {}, belts: {}, pipes: {} },
+  metaRotateMove: { machines: {}, belts: {}, pipes: {} },
+
+  base_grid_x: null,
+  base_grid_y: null,
+  now_grid_x: null,
+  now_grid_y: null,
+  last_delta_x: 0,
+  last_delta_y: 0,
+  base_pixel_x: null,
+  base_pixel_y: null,
+  now_pixel_x: null,
+  now_pixel_y: null,
+
+  queue: { mousedown: {}, mouseup: {}, mousemove: {} },
+  placingMachineType: null,
+  pre_machine: null,
+  nowPlaceNodeType: null, // 放置节点时记录 node 类型（split/merge/cross/default）
+  pre_node: null, // 预创建的单节点对象（belt/pipe），用于预览和旋转
+};
+
+// === 可视化控制 ===
+
+function initIndicator() {
+  S.placeIndicator = drawMask({ gridX: 1, gridY: 1 });
+  S.placeIndicator.visible = false;
+  S.selectIndicator = drawSelectBox();
+  S.selectIndicator.visible = false;
+}
+
+function placeIndicatorHandle(event) {
+  S.placeIndicator.moveToGrid({ gridX: event.gridX, gridY: event.gridY });
+  if (S.hoverIndicator) {
+    S.hoverIndicator.destroy();
+    S.hoverIndicator = null;
+  }
+  const machine = detectOnHoverMachine(event.gridX, event.gridY);
+  const belt = detectOnHoverBelt(event.gridX, event.gridY);
+  const pipe = detectOnHoverPipe(event.gridX, event.gridY);
+  if (machine == null && belt == null && pipe == null) return;
+  S.hoverIndicator = drawHoverIndicator(machine || belt || pipe);
+}
+
+function refreshIndicator() {
+  if (S.indicatorGraphics.length === 0) return;
+  S.indicatorGraphics.forEach((item) => item.destroy());
+  S.indicatorGraphics = [];
+}
+
+function refreshSelectIndicator() {
+  Object.values(S.selectGraphics).forEach((kind) => {
+    Object.values(kind).forEach((item) => item.destroy());
+  });
+  S.selectGraphics = { machines: {}, belts: {}, pipes: {} };
+  S.selectIndicator.visible = false;
+}
+
+function refreshConflictIndicator() {
+  if (S.conflictGraphics.length === 0) return;
+  S.conflictGraphics.forEach((item) => item.destroy());
+  S.conflictGraphics = [];
+}
+
+function refreshIndicatorPosition() {
+  S.base_grid_x = null;
+  S.base_grid_y = null;
+  S.now_grid_x = null;
+  S.now_grid_y = null;
+  S.base_pixel_x = null;
+  S.base_pixel_y = null;
+  S.now_pixel_x = null;
+  S.now_pixel_y = null;
+}
+
+function refreshHandleQueue() {
+  S.queue.mousedown = {};
+  S.queue.mouseup = {};
+  S.queue.mousemove = {};
+}
+
+function rebuildIfSelectMoving() {
+  // 复制模式原始实体仍在 storage，无需（也不应）重建
+  if (S.isSelectMoving && !S.is_select_copy) {
+    Object.keys(S.metaBackup.machines).forEach((id) => {
+      const m = S.metaBackup.machines[id];
+      placeMachine(m, m.gridX, m.gridY);
+    });
+    Object.keys(S.metaBackup.belts).forEach((id) => {
+      const b = S.metaBackup.belts[id];
+      placeBelt(b, b.gridX, b.gridY, b.in, b.out);
+    });
+    Object.keys(S.metaBackup.pipes).forEach((id) => {
+      const p = S.metaBackup.pipes[id];
+      placePipe(p, p.gridX, p.gridY, p.in, p.out);
+    });
+  }
+  S.is_select_copy = false;
+  S.isSelectMoving = false;
+  S.metaBackup = { machines: {}, belts: {}, pipes: {} };
+}
+
+function moveMasksToOffset(last_delta_x, last_delta_y) {
+  const storageStore = useStorageStore();
+  const cellWidth = storageStore.cellWidth;
+  const cellHeight = storageStore.cellHeight;
+  const pixelDeltaX = S.now_pixel_x - S.base_pixel_x;
+  const pixelDeltaY = S.now_pixel_y - S.base_pixel_y;
+  const gridDeltaX = Math.round(pixelDeltaX / cellWidth);
+  const gridDeltaY = Math.round(pixelDeltaY / cellHeight);
+  if (
+    last_delta_x != null &&
+    Math.abs(gridDeltaX - last_delta_x) < 1 &&
+    Math.abs(gridDeltaY - last_delta_y) < 1
+  ) {
+    return { gridDeltaX: last_delta_x, gridDeltaY: last_delta_y };
+  }
+
+  const moveKind = (kind, meta) => {
+    Object.keys(S.selectGraphics[kind]).forEach((id) => {
+      S.selectGraphics[kind][id].moveToGrid({
+        gridX: meta[id].gridX + gridDeltaX,
+        gridY: meta[id].gridY + gridDeltaY,
+      });
+    });
+  };
+  moveKind("machines", S.metaRotateMove.machines);
+  moveKind("belts", S.metaRotateMove.belts);
+  moveKind("pipes", S.metaRotateMove.pipes);
+  generateConflictMask(
+    detectOnMoveMask(S.metaRotateMove, gridDeltaX, gridDeltaY),
+  );
+  return { gridDeltaX, gridDeltaY };
+}
+
+function setSelectBaseCenterPixel(metaBackup, storageStore) {
+  let max_x = -Infinity;
+  let max_y = -Infinity;
+  let min_x = Infinity;
+  let min_y = Infinity;
+  const cellHeight = storageStore.cellHeight;
+  const cellWidth = storageStore.cellWidth;
+  Object.values(metaBackup.machines).forEach((m) => {
+    max_x = Math.max(max_x, m.centerX + cellWidth * m.gridWidth * 0.5);
+    max_y = Math.max(max_y, m.centerY + cellHeight * m.gridHeight * 0.5);
+    min_x = Math.min(min_x, m.centerX - cellWidth * m.gridWidth * 0.5);
+    min_y = Math.min(min_y, m.centerY - cellHeight * m.gridHeight * 0.5);
+  });
+  Object.values(metaBackup.belts).forEach((b) => {
+    max_x = Math.max(max_x, b.x + cellWidth * 0.5);
+    max_y = Math.max(max_y, b.y + cellHeight * 0.5);
+    min_x = Math.min(min_x, b.x - cellWidth * 0.5);
+    min_y = Math.min(min_y, b.y - cellHeight * 0.5);
+  });
+  Object.values(metaBackup.pipes).forEach((p) => {
+    max_x = Math.max(max_x, p.x + cellWidth * 0.5);
+    max_y = Math.max(max_y, p.y + cellHeight * 0.5);
+    min_x = Math.min(min_x, p.x - cellWidth * 0.5);
+    min_y = Math.min(min_y, p.y - cellHeight * 0.5);
+  });
+  const { gridX, gridY } = pixelToGridNoneOffset(
+    (max_x + min_x) / 2,
+    (max_y + min_y) / 2,
+  );
+  S.base_pixel_x = gridX * cellWidth;
+  S.base_pixel_y = gridY * cellHeight;
+  S.now_pixel_x = S.base_pixel_x;
+  S.now_pixel_y = S.base_pixel_y;
+  // 重置增量，避免 moveMasksToOffset 的 early-return 跳过新一次移动的首帧冲突检测
+  S.last_delta_x = null;
+  S.last_delta_y = null;
+}
+
+function generateConflictMask(metaConflict) {
+  refreshConflictIndicator();
+  S.conflictGraphics = drawConflictMaskOnMove(metaConflict);
+}
+
+// === 状态访问封装 ===
+function setPlacingMachineType(type) {
+  S.placingMachineType = type;
+}
+
+function setNowPlaceNodeType(type) {
+  S.nowPlaceNodeType = type;
+}
+
+function setPreMachine(m) {
+  S.pre_machine = m;
+}
+
+function setPreNode(n) {
+  S.pre_node = n;
+}
+
+function setBaseGrid(x, y) {
+  S.base_grid_x = x;
+  S.base_grid_y = y;
+}
+
+function setNowGrid(x, y) {
+  S.now_grid_x = x;
+  S.now_grid_y = y;
+}
+
+function hasConflict() {
+  return S.conflictGraphics.length > 0;
+}
+
+function setPlaceIndicatorVisible(v) {
+  S.placeIndicator.visible = v;
+}
+
+function setPlaceIndicatorAlpha(a) {
+  S.placeIndicator.alpha = a;
+}
+
+function setPlaceMode(isBelt) {
+  S.nowPlaceIsBelt = isBelt;
+}
+
+function togglePipeOrBeltMode() {
+  S.pipeOrBeltMode = !S.pipeOrBeltMode;
+}
+
+function setSelectMoving(v) {
+  S.isSelectMoving = v;
+}
+
+function setSelectCopy(v) {
+  S.is_select_copy = v;
+}
+
+export {
+  S,
+  initIndicator,
+  placeIndicatorHandle,
+  refreshIndicator,
+  refreshSelectIndicator,
+  refreshConflictIndicator,
+  refreshIndicatorPosition,
+  refreshHandleQueue,
+  rebuildIfSelectMoving,
+  moveMasksToOffset,
+  setSelectBaseCenterPixel,
+  generateConflictMask,
+  setBaseGrid,
+  setNowGrid,
+  hasConflict,
+  setPlaceIndicatorVisible,
+  setPlaceIndicatorAlpha,
+  setPlaceMode,
+  togglePipeOrBeltMode,
+  setSelectMoving,
+  setSelectCopy,
+  setPlacingMachineType,
+  setNowPlaceNodeType,
+  setPreMachine,
+  setPreNode,
+};
+
+// 转发 IndicatorStage 的 draw 函数，避免 Indicator.js 直接依赖 Stage 层
+export {
+  drawMask,
+  drawMaskFromPosition,
+  drawMaskSelectArea,
+  drawMachineMask,
+  drawBeltMask,
+  drawPipeMask,
+  drawSpecialMask,
+} from "../core_stage/IndicatorStage.js";
