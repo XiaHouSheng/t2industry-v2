@@ -69,6 +69,16 @@ const ALL_ITEM_TYPES = ["protocol_core_1", "warehouse_output_1"];
 // pi 输入端口固定附加项：气态息壤（用于激活机器）
 const PI_FIXED_ITEM = "gas_xiranite";
 
+// 特殊物品黑名单（传送带传输机型不可选）
+const PORT_ICON_BLACKLIST = [
+  "tundra_coupon", // 谷地调度券
+  "jinlong_coupon", // 武陵调度券
+  "belt", // 传送带
+  "pipe", // 管道
+  "__miner_water", // 清水
+  "domain_key_tundra", // 超库存传输
+];
+
 // 当前展开配置的端口（默认第一个，即 po1 / bo1 ...）
 const activePortKey = ref(null);
 
@@ -109,10 +119,16 @@ function isFluid(id) {
   return id.startsWith("gas_") || id.startsWith("liquid_");
 }
 
-/** 某端口的候选图标：特殊机型为全部物品；pi(输入)取流体输入+气态息壤；其余取流体输出 */
+/** 某端口的候选图标：特殊机型取非流体、非机器、非黑名单（传送带传输）；pi(输入)取流体输入+气态息壤；其余取流体输出 */
 function portCandidatesFor(key) {
   if (ALL_ITEM_TYPES.includes(props.machine.type)) {
-    return Object.keys(resourcesStore.items);
+    // 传送带传输，流体、机器与黑名单物品不可选
+    return Object.keys(resourcesStore.items).filter(
+      (id) =>
+        !isFluid(id) &&
+        resourcesStore.items[id]?.category !== "machine" &&
+        !PORT_ICON_BLACKLIST.includes(id),
+    );
   }
   const recipe = currentRecipe.value;
   if (!recipe) return [];
