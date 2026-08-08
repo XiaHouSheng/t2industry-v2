@@ -1,0 +1,607 @@
+<script setup>
+/**
+ * RecipeModal — 机器配方选择模态框（水平布局）
+ *
+ * 左侧：机器信息 + 当前配方 + 输出端口(P1/P2)图标配置；
+ * 右侧：可选配方列表。
+ * 图标使用 icons.webp 精灵图（SpriteIcon），配方/端口变更全部经由引擎门面 api.js：
+ *  setNowRecipe / setPortRecipeIcon / getPortRecipeIcon / getMachineObject。
+ */
+import { computed, ref, onMounted, onUnmounted } from "vue";
+import {
+  useResourcesStore,
+  getNowRecipe,
+  getRecipeIds,
+  getPortRecipeIcon,
+  setNowRecipe,
+  setPortRecipeIcon,
+  getMachineObject,
+} from "@/engine/plugin/api.js";
+import SpriteIcon from "./SpriteIcon.vue";
+
+const BASE = import.meta.env.BASE_URL;
+
+const props = defineProps({
+  machine: { type: Object, required: true },
+});
+
+const emit = defineEmits(["close"]);
+
+const resourcesStore = useResourcesStore();
+
+/* ---------- 配方数据 ---------- */
+
+const recipeIds = computed(() => getRecipeIds(props.machine) || []);
+
+const currentId = computed(
+  () => getNowRecipe(props.machine) || recipeIds.value[0],
+);
+
+const currentRecipe = computed(() => resourcesStore.recipes[currentId.value]);
+
+/** 可选配方列表（按 recipe_id 顺序） */
+const recipes = computed(() =>
+  recipeIds.value.map((id) => resourcesStore.recipes[id]).filter(Boolean),
+);
+
+const machineIcon = computed(
+  () =>
+    (props.machine.type ? `${BASE}machine_icons/${props.machine.type}.png` : ""),
+);
+
+function itemName(id) {
+  return resourcesStore.items[id]?.name || id;
+}
+
+/* ---------- 输出端口图标 ---------- */
+
+// 当前展开配置的端口（"po1" / "po2" / null）
+const openPort = ref(null);
+
+/** 候选图标：当前配方输出物 */
+const portCandidates = computed(() =>
+  Object.keys(currentRecipe.value?.out || {}),
+);
+
+function portIcon(key) {
+  return getPortRecipeIcon(props.machine, key) || null;
+}
+
+function assignPort(key, itemId) {
+  setPortRecipeIcon(props.machine, key, itemId);
+  // 仅重渲染端口层（不强制覆盖，保留手动配置）
+  const container = getMachineObject(props.machine.id);
+  if (container?.renderRecipePort) container.renderRecipePort(false);
+  else container?.refreshRecipeUI?.();
+  openPort.value = null;
+}
+
+/* ---------- 切换配方 ---------- */
+
+function applyRecipe(recipeId) {
+  if (recipeId === currentId.value) return;
+  const machine = props.machine;
+  const recipe = resourcesStore.recipes[recipeId];
+  if (!recipe) return;
+
+  // 1. 更新当前配方
+  setNowRecipe(machine, recipeId);
+
+  // 2. 依据液体/气体输出设置输出端口默认图标（单输出 → po1/po2 相同；双输出 → 依次分配）
+  const fluidOuts = Object.keys(recipe.out || {}).filter(
+    (id) => id.startsWith("gas_") || id.startsWith("liquid_"),
+  );
+  if (fluidOuts.length === 1) {
+    setPortRecipeIcon(machine, "po1", fluidOuts[0]);
+    setPortRecipeIcon(machine, "po2", fluidOuts[0]);
+  } else if (fluidOuts.length >= 2) {
+    setPortRecipeIcon(machine, "po1", fluidOuts[0]);
+    setPortRecipeIcon(machine, "po2", fluidOuts[1]);
+  }
+
+  // 3. 刷新机器容器渲染
+  getMachineObject(machine.id)?.refreshRecipeUI?.();
+}
+
+/* ---------- 关闭（Esc / 遮罩） ---------- */
+
+function close() {
+  emit("close");
+}
+
+function onKeydown(e) {
+  if (e.key === "Escape") close();
+}
+
+onMounted(() => window.addEventListener("keydown", onKeydown));
+onUnmounted(() => window.removeEventListener("keydown", onKeydown));
+</script>
+
+<template>
+  <div class="modal-mask" @click.self="close">
+    <div class="recipe-modal">
+      <!-- 左列：信息 + 当前配方 + 端口配置 -->
+      <aside class="left">
+        <header class="modal-head">
+          <img
+            v-if="machineIcon"
+            :src="machineIcon"
+            class="head-icon"
+            alt=""
+          />
+          <div class="head-text">
+            <span class="head-title">{{ machine.name || machine.type }}</span>
+            <span class="head-sub">配方选择</span>
+          </div>
+          <button class="head-close" title="关闭" @click="close">×</button>
+        </header>
+
+        <!-- 当前配方 -->
+        <section class="cur-section">
+          <span class="sec-label">当前配方</span>
+          <div class="cur-recipe">
+            <span class="cur-name">{{ currentRecipe?.name || "无配方" }}</span>
+            <div class="io-row">
+              <span class="io-tag in">输入</span>
+              <div
+                v-for="(count, itemId) in currentRecipe?.in"
+                :key="`in-${itemId}`"
+                class="io-item"
+              >
+                <SpriteIcon :item-id="itemId" :size="26" />
+                <span class="io-name">{{ itemName(itemId) }}</span>
+                <span class="io-count">×{{ count }}</span>
+              </div>
+            </div>
+            <div class="io-row">
+              <span class="io-tag out">输出</span>
+              <div
+                v-for="(count, itemId) in currentRecipe?.out"
+                :key="`out-${itemId}`"
+                class="io-item"
+              >
+                <SpriteIcon :item-id="itemId" :size="26" />
+                <span class="io-name">{{ itemName(itemId) }}</span>
+                <span class="io-count">×{{ count }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 输出端口图标配置 -->
+        <section class="ports-section">
+          <span class="sec-label">输出端口图标</span>
+          <div
+            v-for="key in ['po1', 'po2']"
+            :key="key"
+            class="port-slot"
+          >
+            <span class="port-key">{{ key === "po1" ? "P1" : "P2" }}</span>
+            <SpriteIcon
+              v-if="portIcon(key)"
+              :item-id="portIcon(key)"
+              :size="38"
+            />
+            <span v-else class="port-empty">未设置</span>
+            <span class="port-name">{{ itemName(portIcon(key)) }}</span>
+            <button
+              class="port-btn"
+              :class="{ open: openPort === key }"
+              @click="openPort = openPort === key ? null : key"
+            >
+              ▾
+            </button>
+
+            <div v-if="openPort === key" class="port-picker">
+              <button
+                v-for="id in portCandidates"
+                :key="id"
+                class="port-opt"
+                :class="{ sel: portIcon(key) === id }"
+                @click="assignPort(key, id)"
+              >
+                <SpriteIcon :item-id="id" :size="26" />
+                <span>{{ itemName(id) }}</span>
+              </button>
+              <p v-if="!portCandidates.length" class="empty">
+                当前配方无输出物
+              </p>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <!-- 右列：可选配方 -->
+      <section class="right">
+        <span class="sec-label">可选配方（{{ recipes.length }}）</span>
+        <div class="recipe-list">
+          <button
+            v-for="r in recipes"
+            :key="r.id"
+            class="recipe-item"
+            :class="{ active: r.id === currentId }"
+            @click="applyRecipe(r.id)"
+          >
+            <span class="recipe-name">
+              {{ r.name }}
+              <span v-if="r.id === currentId" class="recipe-now">当前</span>
+            </span>
+            <span class="io-row">
+              <span
+                v-for="(count, itemId) in r.in"
+                :key="`in-${itemId}`"
+                class="io-item"
+              >
+                <SpriteIcon :item-id="itemId" :size="30" />
+                <span class="io-name">{{ itemName(itemId) }}</span>
+                <span class="io-count">×{{ count }}</span>
+              </span>
+              <span class="io-arrow">→</span>
+              <span
+                v-for="(count, itemId) in r.out"
+                :key="`out-${itemId}`"
+                class="io-item"
+              >
+                <SpriteIcon :item-id="itemId" :size="30" />
+                <span class="io-name">{{ itemName(itemId) }}</span>
+                <span class="io-count">×{{ count }}</span>
+              </span>
+            </span>
+          </button>
+          <p v-if="recipes.length === 0" class="empty">该机器没有可选配方</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.recipe-modal {
+  display: flex;
+  width: 780px;
+  max-width: calc(100vw - 32px);
+  height: 480px;
+  max-height: calc(100vh - 64px);
+  background: var(--bg-1);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+/* ===== 左列 ===== */
+
+.left {
+  flex: none;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 0 14px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.head-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.head-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.head-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.head-sub {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.head-close {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.head-close:hover {
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+.sec-label {
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 1px;
+}
+
+.cur-section,
+.ports-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 14px;
+}
+
+.cur-recipe {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--accent);
+  border-radius: 7px;
+}
+
+.cur-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-strong);
+}
+
+.io-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.io-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px 2px 3px;
+  background: var(--bg-0);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.io-name {
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.io-count {
+  color: var(--text-faint);
+}
+
+.io-tag {
+  flex: none;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.io-tag.in {
+  color: #7ab6ff;
+  background: rgba(80, 140, 255, 0.12);
+}
+
+.io-tag.out {
+  color: #ffb86b;
+  background: rgba(255, 170, 60, 0.12);
+}
+
+.io-arrow {
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+/* ===== 端口配置 ===== */
+
+.port-slot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.port-key {
+  flex: none;
+  width: 30px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.port-empty {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--text-faint);
+  background: var(--bg-0);
+  border-radius: 50%;
+}
+
+.port-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.port-btn {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-dim);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.port-btn:hover,
+.port-btn.open {
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+.port-picker {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 8px;
+  right: 8px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  background: rgba(21, 24, 29, 0.97);
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.port-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--text-dim);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.port-opt:hover {
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+.port-opt.sel {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+/* ===== 右列 ===== */
+
+.right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+}
+
+.recipe-list {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.recipe-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text-dim);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.recipe-item:hover {
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+.recipe-item.active {
+  border-color: var(--accent);
+}
+
+.recipe-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.recipe-item.active .recipe-name {
+  color: var(--accent-strong);
+}
+
+.recipe-now {
+  font-size: 10px;
+  font-weight: 400;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent-dim);
+  color: var(--accent-strong);
+}
+
+.empty {
+  margin: 0;
+  padding: 16px 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+</style>

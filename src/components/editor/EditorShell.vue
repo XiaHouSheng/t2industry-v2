@@ -7,11 +7,12 @@
  *  2. 注册引擎机器点击回调，把画布选中机器同步到 UI。
  * UI 组件只读写 EditorStore，不直接触碰引擎命令状态。
  */
-import { watch, onUnmounted } from "vue";
+import { ref, watch, onUnmounted } from "vue";
 import SimCanvas from "@/components/SimCanvas.vue";
 import TopBar from "./TopBar.vue";
 import PlaceBar from "./PlaceBar.vue";
 import StatusBar from "./StatusBar.vue";
+import RecipeModal from "./RecipeModal.vue";
 import {
   useCommandStore,
   setMachineClickHandler,
@@ -27,6 +28,9 @@ import {
 
 const editorStore = useEditorStore();
 const commandStore = useCommandStore();
+
+// 配方选择模态框：点击机器时打开
+const recipeMachine = ref(null);
 
 // 引擎命令 → UI 工具映射
 const CMD_TO_TOOL = {
@@ -53,8 +57,9 @@ watch(
   },
 );
 
-// 引擎机器点击 → 同步到 UI（属性面板/状态栏展示）
+// 引擎机器点击 → 打开配方选择模态框，并同步到 UI（属性面板/状态栏展示）
 setMachineClickHandler((machine) => {
+  recipeMachine.value = machine;
   editorStore.selectedMachine = {
     id: machine.id,
     name: machine.name || machine.type,
@@ -78,6 +83,11 @@ onUnmounted(() => setMachineClickHandler(null));
       </main>
     </div>
     <StatusBar />
+    <RecipeModal
+      v-if="recipeMachine"
+      :machine="recipeMachine"
+      @close="recipeMachine = null"
+    />
   </div>
 </template>
 
