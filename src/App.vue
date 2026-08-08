@@ -1,7 +1,7 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import SimCanvas from "@/components/SimCanvas.vue";
 </script>
 
 <template>
-  <HelloWorld />
+    <SimCanvas />
 </template>
