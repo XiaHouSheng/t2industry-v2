@@ -55,16 +55,77 @@ function itemName(id) {
 
 /* ---------- 输出端口图标 ---------- */
 
-// 当前展开配置的端口（"po1" / "po2" / null）
-const openPort = ref(null);
+// 端口配置面板预留的机型（暗管出入口）
+const RESERVED_TYPES = [
+  "concealed_pipe_in_1",
+  "concealed_pipe_out",
+  "concealed_pipe_in_muti_1",
+  "concealed_pipe_out_muti_1",
+];
 
-/** 候选图标：当前配方输出物 */
-const portCandidates = computed(() =>
-  Object.keys(currentRecipe.value?.out || {}),
+// 候选图标为全部物品的机型（协议核心 / 仓库取货口）
+const ALL_ITEM_TYPES = ["protocol_core_1", "warehouse_output_1"];
+
+// 当前展开配置的端口（默认第一个，即 po1 / bo1 ...）
+const activePortKey = ref(null);
+
+/** 实际生效的活动端口（键失效时回退到第一个） */
+const activePort = computed(() => {
+  if (!portKeys.value.length) return null;
+  return portKeys.value.includes(activePortKey.value)
+    ? activePortKey.value
+    : portKeys.value[0];
+});
+
+/** 右侧面板 tab：配方 / 端口图标 */
+const rightTab = ref("recipes");
+
+/** 是否端口面板预留 */
+const isReserved = computed(() => RESERVED_TYPES.includes(props.machine.type));
+
+/** 可配置的输出端口列表：以配置中的 port_recipe_icon 键为准（po1/po2/bo1/pi1...） */
+const portKeys = computed(() => Object.keys(props.machine.port_recipe_icon || {}));
+
+/** 是否有端口图标配置能力 */
+const hasPortConfig = computed(() => !isReserved.value && portKeys.value.length > 0);
+
+/** 端口方向：从 mask 中该端口的 cell 前缀判断（bo/po=输出，pi=输入） */
+function portType(key) {
+  const mask = props.machine.mask || props.machine.defaultMask || [];
+  for (const row of mask) {
+    for (const cell of row) {
+      const parts = String(cell).split(".");
+      if (parts[2] === key) return parts[0];
+    }
+  }
+  return key.startsWith("pi") ? "pi" : "bo";
+}
+
+/** 某端口的候选图标：特殊机型为全部物品；pi(输入)取配方输入物；其余取配方输出物 */
+function portCandidatesFor(key) {
+  if (ALL_ITEM_TYPES.includes(props.machine.type)) {
+    return Object.keys(resourcesStore.items);
+  }
+  const recipe = currentRecipe.value;
+  if (!recipe) return [];
+  return portType(key) === "pi"
+    ? Object.keys(recipe.in || {})
+    : Object.keys(recipe.out || {});
+}
+
+/** 活动端口的候选图标 */
+const activePortCandidates = computed(() =>
+  activePort.value ? portCandidatesFor(activePort.value) : [],
 );
 
 function portIcon(key) {
   return getPortRecipeIcon(props.machine, key) || null;
+}
+
+/** 选中活动端口并切到图标面板 */
+function selectPort(key) {
+  activePortKey.value = key;
+  rightTab.value = "icons";
 }
 
 function assignPort(key, itemId) {
@@ -73,7 +134,6 @@ function assignPort(key, itemId) {
   const container = getMachineObject(props.machine.id);
   if (container?.renderRecipePort) container.renderRecipePort(false);
   else container?.refreshRecipeUI?.();
-  openPort.value = null;
 }
 
 /* ---------- 切换配方 ---------- */
@@ -169,52 +229,62 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
         </section>
 
         <!-- 输出端口图标配置 -->
-        <section class="ports-section">
+        <section
+          v-if="isReserved || hasPortConfig"
+          class="ports-section"
+        >
           <span class="sec-label">输出端口图标</span>
-          <div
-            v-for="key in ['po1', 'po2']"
-            :key="key"
-            class="port-slot"
-          >
-            <span class="port-key">{{ key === "po1" ? "P1" : "P2" }}</span>
-            <SpriteIcon
-              v-if="portIcon(key)"
-              :item-id="portIcon(key)"
-              :size="38"
-            />
-            <span v-else class="port-empty">未设置</span>
-            <span class="port-name">{{ itemName(portIcon(key)) }}</span>
-            <button
-              class="port-btn"
-              :class="{ open: openPort === key }"
-              @click="openPort = openPort === key ? null : key"
-            >
-              ▾
-            </button>
 
-            <div v-if="openPort === key" class="port-picker">
-              <button
-                v-for="id in portCandidates"
-                :key="id"
-                class="port-opt"
-                :class="{ sel: portIcon(key) === id }"
-                @click="assignPort(key, id)"
-              >
-                <SpriteIcon :item-id="id" :size="26" />
-                <span>{{ itemName(id) }}</span>
-              </button>
-              <p v-if="!portCandidates.length" class="empty">
-                当前配方无输出物
-              </p>
-            </div>
+          <!-- 预留机型：面板占位 -->
+          <div v-if="isReserved" class="port-reserved">
+            该机器的端口配置面板暂未开放（预留）
           </div>
+
+          <template v-else>
+            <div
+              v-for="key in portKeys"
+              :key="key"
+              class="port-slot"
+              :class="{ active: activePort === key }"
+              :title="`点击选择 ${key.toUpperCase()} 的图标`"
+              @click="selectPort(key)"
+            >
+              <span class="port-key">{{ key.toUpperCase() }}</span>
+              <SpriteIcon
+                v-if="portIcon(key)"
+                :item-id="portIcon(key)"
+                :size="38"
+              />
+              <span v-else class="port-empty">未设置</span>
+              <span class="port-name">{{ itemName(portIcon(key)) }}</span>
+              <span class="port-edit">编辑</span>
+            </div>
+          </template>
         </section>
       </aside>
 
-      <!-- 右列：可选配方 -->
+      <!-- 右列：可选配方 / 端口图标 -->
       <section class="right">
-        <span class="sec-label">可选配方（{{ recipes.length }}）</span>
-        <div class="recipe-list">
+        <div class="right-tabs">
+          <button
+            class="right-tab"
+            :class="{ active: rightTab === 'recipes' }"
+            @click="rightTab = 'recipes'"
+          >
+            配方
+          </button>
+          <button
+            v-if="hasPortConfig"
+            class="right-tab"
+            :class="{ active: rightTab === 'icons' }"
+            @click="rightTab = 'icons'"
+          >
+            端口图标
+          </button>
+        </div>
+
+        <!-- 可选配方 -->
+        <div v-show="rightTab === 'recipes'" class="recipe-list">
           <button
             v-for="r in recipes"
             :key="r.id"
@@ -249,6 +319,39 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
             </span>
           </button>
           <p v-if="recipes.length === 0" class="empty">该机器没有可选配方</p>
+        </div>
+
+        <!-- 端口图标选择 -->
+        <div v-show="rightTab === 'icons'" class="icon-panel">
+          <div class="icon-head">
+            选择图标 →
+            <b class="icon-target">{{ activePort?.toUpperCase() }}</b>
+            <span v-if="activePort && portType(activePort) === 'pi'" class="icon-dir">
+              （输入）
+            </span>
+          </div>
+          <div class="icon-grid">
+            <button
+              class="icon-cell clear"
+              :class="{ sel: activePort && !portIcon(activePort) }"
+              title="清空该端口图标"
+              @click="activePort && assignPort(activePort, null)"
+            >
+              <span class="cell-clear"></span>
+              <span class="cell-name">清空</span>
+            </button>
+            <button
+              v-for="id in activePortCandidates"
+              :key="id"
+              class="icon-cell"
+              :class="{ sel: activePort && portIcon(activePort) === id }"
+              @click="activePort && assignPort(activePort, id)"
+            >
+              <SpriteIcon :item-id="id" :size="48" />
+              <span class="cell-name">{{ itemName(id) }}</span>
+            </button>
+            <p v-if="!activePortCandidates.length" class="empty">无可选图标</p>
+          </div>
         </div>
       </section>
     </div>
@@ -431,7 +534,6 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
 /* ===== 端口配置 ===== */
 
 .port-slot {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -439,14 +541,34 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
   background: var(--bg-2);
   border: 1px solid var(--border);
   border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.port-slot:hover {
+  background: var(--bg-3);
+}
+
+.port-slot.active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
 }
 
 .port-key {
   flex: none;
-  width: 30px;
-  font-size: 11px;
+  min-width: 32px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--text-dim);
+}
+
+.port-reserved {
+  padding: 18px 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 7px;
+  font-size: 11px;
+  color: var(--text-faint);
+  text-align: center;
 }
 
 .port-empty {
@@ -471,65 +593,18 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
   white-space: nowrap;
 }
 
-.port-btn {
+.port-edit {
   flex: none;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  color: var(--text-dim);
-  font-size: 12px;
-  cursor: pointer;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-0);
+  color: var(--text-faint);
 }
 
-.port-btn:hover,
-.port-btn.open {
-  background: var(--bg-3);
-  color: var(--text);
-}
-
-.port-picker {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 8px;
-  right: 8px;
-  z-index: 30;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 6px;
-  background: rgba(21, 24, 29, 0.97);
-  border: 1px solid var(--border-strong);
-  border-radius: 7px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-
-.port-opt {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 8px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  color: var(--text-dim);
-  font-size: 12px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.port-opt:hover {
-  background: var(--bg-3);
-  color: var(--text);
-}
-
-.port-opt.sel {
-  border-color: var(--accent);
-  color: var(--accent-strong);
+.port-slot.active .port-edit {
+  background: var(--accent);
+  color: #fff;
 }
 
 /* ===== 右列 ===== */
@@ -541,6 +616,135 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
   flex-direction: column;
   gap: 10px;
   padding: 14px;
+}
+
+.right-tabs {
+  flex: none;
+  display: flex;
+  gap: 4px;
+}
+
+.right-tab {
+  padding: 5px 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.right-tab:hover {
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+.right-tab.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+/* 端口图标面板 */
+
+.icon-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.icon-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.icon-target {
+  padding: 1px 10px;
+  border-radius: 5px;
+  background: var(--accent-dim);
+  color: var(--accent-strong);
+  font-size: 12px;
+}
+
+.icon-dir {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.icon-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  align-content: start;
+  gap: 10px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.icon-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 4px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.icon-cell:hover {
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+.icon-cell.sel {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent-strong);
+}
+
+.cell-clear {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px dashed var(--border-strong);
+  background: linear-gradient(
+    135deg,
+    transparent 44%,
+    var(--text-faint) 44%,
+    var(--text-faint) 56%,
+    transparent 56%
+  );
+}
+
+.icon-cell.sel .cell-clear {
+  border-color: var(--accent);
+  background: linear-gradient(
+    135deg,
+    transparent 44%,
+    var(--accent-strong) 44%,
+    var(--accent-strong) 56%,
+    transparent 56%
+  );
+}
+
+.cell-name {
+  width: 100%;
+  font-size: 11px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .recipe-list {

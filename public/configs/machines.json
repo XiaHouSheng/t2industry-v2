@@ -1392,12 +1392,14 @@
     "mask": [
       [
         "ma",
-        "bo.down",
+        "bo.down.bo1",
         "ma"
       ]
     ],
     "id": "warehouse_output_1",
-    "port_recipe_icon": {}
+    "port_recipe_icon": {
+      "bo1": null
+    }
   },
   "warehouse_input_1": {
     "name": "仓库存货口",
