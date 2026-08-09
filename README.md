@@ -77,6 +77,11 @@ public/
 - Default language: **Chinese (Simplified)**; switch to English via the `EN / 中文` button in the top bar
 - The selection is persisted in `localStorage`
 
+## Related Projects
+
+- [t2industry](https://github.com/XiaHouSheng/t2industry) — the **v1** version of this blueprint editor
+- [T2EngineCore](https://github.com/XiaHouSheng/T2EngineCore) — the core engine (PIXI.js canvas engine) that powers this editor
+
 ## Disclaimer
 
 This project is an **unofficial, fan-made** tool. It is **not affiliated with, endorsed by, or connected to** Hypergryph or any of its subsidiaries.

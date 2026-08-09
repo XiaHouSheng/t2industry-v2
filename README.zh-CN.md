@@ -77,6 +77,11 @@ public/
 - 默认语言：**简体中文**；可通过顶部栏的 `EN / 中文` 按钮切换到英文
 - 语言选择保存在 `localStorage` 中
 
+## 相关项目
+
+- [t2industry](https://github.com/XiaHouSheng/t2industry) — 本编辑器的 **v1** 版本
+- [T2EngineCore](https://github.com/XiaHouSheng/T2EngineCore) — 驱动本编辑器的核心引擎（PIXI.js 画布引擎）
+
 ## 免责声明
 
 本项目为 **非官方的同人工具**，与鹰角网络（Hypergryph）及其子公司**没有任何关联、认可或合作关系**。
