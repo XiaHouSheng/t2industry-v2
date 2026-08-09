@@ -6,6 +6,7 @@
  * 右侧：蓝图文件操作与视图控制。全部经由引擎门面 api.js 调用。
  */
 import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useI18n } from "vue-i18n";
 import {
   useStorageStore,
   addBlueprintLocal,
@@ -25,7 +26,9 @@ import {
   TOOL_BELT,
   TOOL_PIPE,
 } from "@/stores/EditorStore.js";
+import { setLocale } from "@/i18n/index.js";
 
+const { t, locale } = useI18n();
 const storageStore = useStorageStore();
 const editorStore = useEditorStore();
 
@@ -53,7 +56,7 @@ function onSelectBp(id) {
 }
 
 function onNewBlueprint() {
-  const name = window.prompt("蓝图名称", "New Blueprint");
+  const name = window.prompt(t("topbar.newBlueprintPrompt"), t("topbar.newBlueprintDefault"));
   if (name && name.trim()) {
     addBlueprintLocal(name.trim());
     closeBp();
@@ -63,8 +66,8 @@ function onNewBlueprint() {
 function onDeleteBp(bp) {
   const hint =
     blueprintList.value.length > 1
-      ? `确定删除蓝图「${bp.name}」？`
-      : `只剩最后一个蓝图，无法删除；将清空其内容，确定继续？`;
+      ? t("topbar.deleteConfirm", { name: bp.name })
+      : t("topbar.deleteLastConfirm");
   if (window.confirm(hint)) {
     deleteBlueprintLocal(bp.id);
     closeBp();
@@ -82,9 +85,9 @@ onUnmounted(() => document.removeEventListener("click", onDocClick));
 /* ---------- 放置工具 ---------- */
 
 const toolList = [
-  { tool: TOOL_SELECT, label: "选择", key: "X" },
-  { tool: TOOL_BELT, label: "传送带", key: "E" },
-  { tool: TOOL_PIPE, label: "管道", key: "Q" },
+  { tool: TOOL_SELECT, labelKey: "tools.select", key: "X" },
+  { tool: TOOL_BELT, labelKey: "tools.belt", key: "E" },
+  { tool: TOOL_PIPE, labelKey: "tools.pipe", key: "Q" },
 ];
 
 function pickTool(tool) {
@@ -100,12 +103,18 @@ function pickTool(tool) {
 /* ---------- 蓝图操作 ---------- */
 
 function onClearBlueprint() {
-  if (window.confirm("确定清空当前蓝图？")) clearBlueprintLocal();
+  if (window.confirm(t("topbar.clearConfirm"))) clearBlueprintLocal();
 }
 
 function onResetView() {
   resetScale();
   resetPosition();
+}
+
+/* ---------- 语言切换 ---------- */
+
+function toggleLang() {
+  setLocale(locale.value === "zh-CN" ? "en-US" : "zh-CN");
 }
 </script>
 
@@ -117,12 +126,13 @@ function onResetView() {
         src="/resources/logo_256px_transparent.png"
         alt="T2·工业"
       />
+      <span class="brand-name">{{ t("topbar.brand") }}</span>
     </div>
 
     <!-- 蓝图选择下拉 -->
     <div class="bp-drop" @click.stop>
       <button class="bp-trigger" @click="toggleBp">
-        <span class="bp-label">蓝图</span>
+        <span class="bp-label">{{ t("topbar.blueprint") }}</span>
         <span class="bp-name">{{ currentBlueprint?.name || "未命名" }}</span>
         <svg
           class="bp-chevron"
@@ -148,7 +158,7 @@ function onResetView() {
           </button>
           <button
             class="bp-del"
-            title="删除蓝图"
+            :title="t('topbar.deleteBlueprint')"
             @click="onDeleteBp(bp)"
           >
             ×
@@ -156,13 +166,15 @@ function onResetView() {
         </div>
 
         <div class="bp-menu-actions">
-          <button class="ui-btn bp-new" @click="onNewBlueprint">+ 新建蓝图</button>
+          <button class="ui-btn bp-new" @click="onNewBlueprint">
+            + {{ t("topbar.newBlueprint") }}
+          </button>
         </div>
       </div>
     </div>
 
     <div class="tools">
-      <span class="tool-label">工具</span>
+      <span class="tool-label">{{ t("topbar.tools") }}</span>
       <button
         v-for="item in toolList"
         :key="item.tool"
@@ -170,19 +182,36 @@ function onResetView() {
         :class="{ active: editorStore.currentTool === item.tool }"
         @click="pickTool(item.tool)"
       >
-        <span>{{ item.label }}</span>
+        <span>{{ t(item.labelKey) }}</span>
         <kbd>{{ item.key }}</kbd>
       </button>
     </div>
 
     <div class="actions">
-      <button class="ui-btn" title="Ctrl+S" @click="saveBlueprintLocal()">保存</button>
-      <button class="ui-btn" @click="onClearBlueprint()">清空</button>
+      <button
+        class="ui-btn"
+        :title="t('topbar.lang')"
+        @click="toggleLang"
+      >
+        {{ locale === "zh-CN" ? "EN" : "中文" }}
+      </button>
+      <button class="ui-btn" title="Ctrl+S" @click="saveBlueprintLocal()">
+        {{ t("topbar.save") }}
+      </button>
+      <button class="ui-btn" @click="onClearBlueprint()">
+        {{ t("topbar.clear") }}
+      </button>
       <span class="divider"></span>
-      <button class="ui-btn" @click="loadBlueprintFromFile()">导入</button>
-      <button class="ui-btn" @click="exportBlueprintToFile()">导出</button>
+      <button class="ui-btn" @click="loadBlueprintFromFile()">
+        {{ t("topbar.import") }}
+      </button>
+      <button class="ui-btn" @click="exportBlueprintToFile()">
+        {{ t("topbar.export") }}
+      </button>
       <span class="divider"></span>
-      <button class="ui-btn" @click="onResetView()">复位视图</button>
+      <button class="ui-btn" @click="onResetView()">
+        {{ t("topbar.resetView") }}
+      </button>
     </div>
   </header>
 </template>

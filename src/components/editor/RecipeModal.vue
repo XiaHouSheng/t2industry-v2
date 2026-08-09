@@ -8,6 +8,7 @@
  *  setNowRecipe / setPortRecipeIcon / getPortRecipeIcon / getMachineObject。
  */
 import { computed, ref, onMounted, onUnmounted } from "vue";
+import { useI18n } from "vue-i18n";
 import {
   useResourcesStore,
   getNowRecipe,
@@ -27,6 +28,7 @@ const props = defineProps({
 
 const emit = defineEmits(["close"]);
 
+const { t } = useI18n();
 const resourcesStore = useResourcesStore();
 
 /* ---------- 配方数据 ---------- */
@@ -217,18 +219,24 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
           />
           <div class="head-text">
             <span class="head-title">{{ machine.name || machine.type }}</span>
-            <span class="head-sub">配方选择</span>
+            <span class="head-sub">{{ t("recipeModal.headSub") }}</span>
           </div>
-          <button class="head-close" title="关闭" @click="close">×</button>
+          <button
+            class="head-close"
+            :title="t('common.close')"
+            @click="close"
+          >
+            ×
+          </button>
         </header>
 
         <!-- 当前配方 -->
         <section class="cur-section">
-          <span class="sec-label">当前配方</span>
+          <span class="sec-label">{{ t("recipeModal.currentRecipe") }}</span>
           <div class="cur-recipe">
-            <span class="cur-name">{{ currentRecipe?.name || "无配方" }}</span>
+            <span class="cur-name">{{ currentRecipe?.name || t("recipeModal.noRecipe") }}</span>
             <div class="io-row">
-              <span class="io-tag in">输入</span>
+              <span class="io-tag in">{{ t("common.input") }}</span>
               <div
                 v-for="(count, itemId) in currentRecipe?.in"
                 :key="`in-${itemId}`"
@@ -240,7 +248,7 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
               </div>
             </div>
             <div class="io-row">
-              <span class="io-tag out">输出</span>
+              <span class="io-tag out">{{ t("common.output") }}</span>
               <div
                 v-for="(count, itemId) in currentRecipe?.out"
                 :key="`out-${itemId}`"
@@ -259,11 +267,11 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
           v-if="isReserved || hasPortConfig"
           class="ports-section"
         >
-          <span class="sec-label">输出端口图标</span>
+          <span class="sec-label">{{ t("recipeModal.outputPortIcon") }}</span>
 
           <!-- 预留机型：面板占位 -->
           <div v-if="isReserved" class="port-reserved">
-            该机器的端口配置面板暂未开放（预留）
+            {{ t("recipeModal.reservedHint") }}
           </div>
 
           <template v-else>
@@ -272,7 +280,7 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
               :key="key"
               class="port-slot"
               :class="{ active: activePort === key }"
-              :title="`点击选择 ${key.toUpperCase()} 的图标`"
+              :title="t('recipeModal.portTitle', { key: key.toUpperCase() })"
               @click="selectPort(key)"
             >
               <span class="port-key">{{ key.toUpperCase() }}</span>
@@ -281,9 +289,9 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
                 :item-id="portIcon(key)"
                 :size="38"
               />
-              <span v-else class="port-empty">未设置</span>
+              <span v-else class="port-empty">{{ t("recipeModal.notSet") }}</span>
               <span class="port-name">{{ itemName(portIcon(key)) }}</span>
-              <span class="port-edit">编辑</span>
+              <span class="port-edit">{{ t("recipeModal.edit") }}</span>
             </div>
           </template>
         </section>
@@ -297,7 +305,7 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
             :class="{ active: rightTab === 'recipes' }"
             @click="rightTab = 'recipes'"
           >
-            配方
+            {{ t("recipeModal.recipes") }}
           </button>
           <button
             v-if="hasPortConfig"
@@ -305,7 +313,7 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
             :class="{ active: rightTab === 'icons' }"
             @click="rightTab = 'icons'"
           >
-            端口图标
+            {{ t("recipeModal.portIcons") }}
           </button>
         </div>
 
@@ -320,7 +328,7 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
           >
             <span class="recipe-name">
               {{ r.name }}
-              <span v-if="r.id === currentId" class="recipe-now">当前</span>
+              <span v-if="r.id === currentId" class="recipe-now">{{ t("common.current") }}</span>
             </span>
             <span class="io-row">
               <span
@@ -344,27 +352,32 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
               </span>
             </span>
           </button>
-          <p v-if="recipes.length === 0" class="empty">该机器没有可选配方</p>
+          <p v-if="recipes.length === 0" class="empty">
+            {{ t("recipeModal.noRecipes") }}
+          </p>
         </div>
 
         <!-- 端口图标选择 -->
         <div v-show="rightTab === 'icons'" class="icon-panel">
           <div class="icon-head">
-            选择图标 →
+            {{ t("recipeModal.chooseIcon") }}
             <b class="icon-target">{{ activePort?.toUpperCase() }}</b>
-            <span v-if="activePort && portType(activePort) === 'pi'" class="icon-dir">
-              （输入）
+            <span
+              v-if="activePort && portType(activePort) === 'pi'"
+              class="icon-dir"
+            >
+              {{ t("recipeModal.inputDir") }}
             </span>
           </div>
           <div class="icon-grid">
             <button
               class="icon-cell clear"
               :class="{ sel: activePort && !portIcon(activePort) }"
-              title="清空该端口图标"
+              :title="t('recipeModal.clearPortTitle')"
               @click="activePort && assignPort(activePort, null)"
             >
               <span class="cell-clear"></span>
-              <span class="cell-name">清空</span>
+              <span class="cell-name">{{ t("recipeModal.clear") }}</span>
             </button>
             <button
               v-for="id in activePortCandidates"
@@ -376,7 +389,9 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
               <SpriteIcon :item-id="id" :size="48" />
               <span class="cell-name">{{ itemName(id) }}</span>
             </button>
-            <p v-if="!activePortCandidates.length" class="empty">无可选图标</p>
+            <p v-if="!activePortCandidates.length" class="empty">
+              {{ t("recipeModal.noIcons") }}
+            </p>
           </div>
         </div>
       </section>

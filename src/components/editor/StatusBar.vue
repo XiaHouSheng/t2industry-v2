@@ -4,6 +4,7 @@
  * 展示当前工具 / 画布缩放 / 选中机器与快捷键提示。
  */
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useStorageStore } from "@/engine/plugin/api.js";
 import {
   useEditorStore,
@@ -14,27 +15,25 @@ import {
   TOOL_NODE,
 } from "@/stores/EditorStore.js";
 
+const { t } = useI18n();
 const storageStore = useStorageStore();
 const editorStore = useEditorStore();
-
-// 节点类型显示名
-const NODE_LABELS = { split: "分流", merge: "合流", cross: "十字" };
 
 const toolLabel = computed(() => {
   switch (editorStore.currentTool) {
     case TOOL_SELECT:
-      return "选择";
+      return t("tools.select");
     case TOOL_BELT:
-      return "传送带";
+      return t("tools.belt");
     case TOOL_PIPE:
-      return "管道";
+      return t("tools.pipe");
     case TOOL_MACHINE:
-      return editorStore.activeMachineType || "放置机器";
+      return editorStore.activeMachineType || t("statusbar.toolPlaceMachine");
     case TOOL_NODE: {
       const n = editorStore.activeNodeType;
-      if (!n) return "放置节点";
-      const kind = n.kind === "belt" ? "传送带" : "管道";
-      return `节点 · ${NODE_LABELS[n.type] || n.type}(${kind})`;
+      if (!n) return t("statusbar.toolPlaceNode");
+      const kind = n.kind === "belt" ? t("tools.belt") : t("tools.pipe");
+      return t("statusbar.nodeLabel", { label: t(`nodes.${n.type}`), kind });
     }
     default:
       return "—";
@@ -43,7 +42,7 @@ const toolLabel = computed(() => {
 
 const selectedLabel = computed(() => {
   const m = editorStore.selectedMachine;
-  if (!m) return "未选中";
+  if (!m) return t("statusbar.notSelected");
   return `${m.name} @ (${m.gridX}, ${m.gridY})`;
 });
 
@@ -53,26 +52,26 @@ const scalePercent = computed(() => Math.round(storageStore.scale * 100));
 <template>
   <footer class="statusbar">
     <div class="status-item">
-      <span class="status-label">工具</span>
+      <span class="status-label">{{ t("statusbar.tool") }}</span>
       <span class="status-value">{{ toolLabel }}</span>
     </div>
     <div class="status-item">
-      <span class="status-label">缩放</span>
+      <span class="status-label">{{ t("statusbar.zoom") }}</span>
       <span class="status-value">{{ scalePercent }}%</span>
     </div>
     <div class="status-item">
-      <span class="status-label">选中</span>
+      <span class="status-label">{{ t("statusbar.selected") }}</span>
       <span class="status-value">{{ selectedLabel }}</span>
     </div>
 
     <div class="hints">
-      <kbd>E</kbd> 传送带
-      <kbd>Q</kbd> 管道
-      <kbd>X</kbd> 选择
-      <kbd>R</kbd> 旋转
-      <kbd>F</kbd> 删除
-      <kbd>Esc</kbd> 取消
-      <kbd>Ctrl+S</kbd> 保存
+      <kbd>E</kbd> {{ t("tools.belt") }}
+      <kbd>Q</kbd> {{ t("tools.pipe") }}
+      <kbd>X</kbd> {{ t("tools.select") }}
+      <kbd>R</kbd> {{ t("statusbar.hintRotate") }}
+      <kbd>F</kbd> {{ t("statusbar.hintDelete") }}
+      <kbd>Esc</kbd> {{ t("statusbar.hintCancel") }}
+      <kbd>Ctrl+S</kbd> {{ t("statusbar.hintSave") }}
     </div>
   </footer>
 </template>

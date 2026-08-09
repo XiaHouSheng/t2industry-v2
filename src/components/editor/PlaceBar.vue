@@ -9,6 +9,7 @@
  * 配置与命令均来自引擎门面。
  */
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import {
   useMachineStore,
   useResourcesStore,
@@ -19,17 +20,16 @@ import { useEditorStore, TOOL_MACHINE, TOOL_NODE } from "@/stores/EditorStore.js
 
 const BASE = import.meta.env.BASE_URL;
 
+const { t } = useI18n();
 const editorStore = useEditorStore();
 const machineStore = useMachineStore();
 const resourcesStore = useResourcesStore();
 
 /* ---------- 机器 ---------- */
 
-// 分类显示名：后续 machines.json 增加 category 字段后在此扩展
-const CATEGORY_LABELS = { default: "默认" };
-
 function categoryLabel(cat) {
-  return CATEGORY_LABELS[cat] || cat;
+  // 分类显示名：后续 machines.json 增加 category 字段后在此扩展
+  return cat === "default" ? t("placebar.categoryDefault") : cat;
 }
 
 /** 机器按 category 分组，无 category 时归 "default" */
@@ -60,20 +60,26 @@ function iconSrc(id) {
 
 /* ---------- 节点 ---------- */
 
+// 节点图标：type 对应 i18n 的 nodes.* 显示名
 const NODE_TYPES = [
-  { type: "split", label: "分流", icon: "bg_logistic_log_splitter" },
-  { type: "merge", label: "合流", icon: "bg_logistic_log_converger" },
-  { type: "cross", label: "十字", icon: "bg_logistic_log_connector" },
+  { type: "split", icon: "bg_logistic_log_splitter" },
+  { type: "merge", icon: "bg_logistic_log_converger" },
+  { type: "cross", icon: "bg_logistic_log_connector" },
 ];
 
 const PIPE_NODE_TYPES = [
-  { type: "split", label: "分流", icon: "bg_logistic_log_pipe_splitter" },
-  { type: "merge", label: "合流", icon: "bg_logistic_log_pipe_converger" },
-  { type: "cross", label: "十字", icon: "bg_logistic_log_pipe_connector" },
+  { type: "split", icon: "bg_logistic_log_pipe_splitter" },
+  { type: "merge", icon: "bg_logistic_log_pipe_converger" },
+  { type: "cross", icon: "bg_logistic_log_pipe_connector" },
 ];
 
 function nodeIconSrc(name) {
   return `${BASE}textures/${name}.png`;
+}
+
+/** 节点类型显示名（i18n） */
+function nodeLabel(type) {
+  return t(`nodes.${type}`);
 }
 
 /* ---------- 类型选择 ---------- */
@@ -86,7 +92,7 @@ const typeTabs = computed(() => [
     cat,
     label: categoryLabel(cat),
   })),
-  { key: "node", kind: "node", label: "节点" },
+  { key: "node", kind: "node", label: t("placebar.node") },
 ]);
 
 const activeTabKey = ref(null);
@@ -107,8 +113,8 @@ const machineItems = computed(
 const nodeGroups = computed(() => {
   if (activeTab.value?.kind !== "node") return [];
   return [
-    { label: "传送带", kind: "belt", items: NODE_TYPES },
-    { label: "管道", kind: "pipe", items: PIPE_NODE_TYPES },
+    { label: t("tools.belt"), kind: "belt", items: NODE_TYPES },
+    { label: t("tools.pipe"), kind: "pipe", items: PIPE_NODE_TYPES },
   ];
 });
 
@@ -165,7 +171,7 @@ function isNodeActive(nodeType, kind) {
           :key="m.id"
           class="bar-item"
           :class="{ active: isMachineActive(m.id) }"
-          :title="`${m.name}（${m.gridWidth}×${m.gridHeight}）`"
+          :title="t('placebar.machineTitle', { name: m.name, w: m.gridWidth, h: m.gridHeight })"
           @click="pickMachine(m.id)"
         >
           <img
@@ -190,11 +196,11 @@ function isNodeActive(nodeType, kind) {
             :key="`${group.kind}-${n.type}`"
             class="bar-item"
             :class="{ active: isNodeActive(n.type, group.kind) }"
-            :title="`${group.label}${n.label}`"
+            :title="`${group.label}${nodeLabel(n.type)}`"
             @click="pickNode(n.type, group.kind)"
           >
             <img :src="nodeIconSrc(n.icon)" class="bar-icon" alt="" />
-            <span class="bar-label">{{ n.label }}</span>
+            <span class="bar-label">{{ nodeLabel(n.type) }}</span>
           </button>
         </template>
       </template>
