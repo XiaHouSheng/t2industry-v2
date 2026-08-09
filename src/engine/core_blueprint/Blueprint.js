@@ -41,7 +41,7 @@ function initStoreBlueprint() {
     storageStore.blueprints[temp_blueprint.id] = temp_blueprint;
   }
   renderBlueprint(storageStore.blueprints[storageStore.current_blueprint]);
-  callbackOnInit(storageStore.current_blueprint);
+  if (callbackOnInit) callbackOnInit(storageStore.current_blueprint);
 }
 
 function saveBlueprintLocal() {
@@ -102,7 +102,7 @@ function selectBlueprintLocal(id) {
   // 渲染新蓝图(画布)
   renderBlueprint(storageStore.blueprints[id]);
   // 调用选择蓝图回调
-  callbackOnSelectBlueprint(id);
+  if (callbackOnSelectBlueprint) callbackOnSelectBlueprint(id);
 }
 
 function loadBlueprintFromFile() {

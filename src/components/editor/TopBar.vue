@@ -112,8 +112,11 @@ function onResetView() {
 <template>
   <header class="topbar">
     <div class="brand">
-      <span class="brand-mark"></span>
-      <span class="brand-name">T2·工业蓝图编辑器</span>
+      <img
+        class="brand-mark"
+        src="/resources/logo_256px_transparent.png"
+        alt="T2·工业"
+      />
     </div>
 
     <!-- 蓝图选择下拉 -->
@@ -202,11 +205,10 @@ function onResetView() {
 }
 
 .brand-mark {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
-  box-shadow: 0 0 10px var(--accent-dim);
+  width: 44px;
+  height: 44px;
+  border-radius: 5px;
+  object-fit: contain;
 }
 
 .brand-name {
