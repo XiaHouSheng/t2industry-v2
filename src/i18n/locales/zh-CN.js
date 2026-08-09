@@ -19,7 +19,7 @@ export default {
     cross: "十字",
   },
   topbar: {
-    brand: "T2·工业蓝图编辑器",
+    brand: "T2industry",
     blueprint: "蓝图",
     newBlueprint: "新建蓝图",
     newBlueprintPrompt: "蓝图名称",

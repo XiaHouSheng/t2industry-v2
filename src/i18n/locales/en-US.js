@@ -19,7 +19,7 @@ export default {
     cross: "Cross",
   },
   topbar: {
-    brand: "T2·Industrial Blueprint Editor",
+    brand: "T2industry",
     blueprint: "Blueprint",
     newBlueprint: "New Blueprint",
     newBlueprintPrompt: "Blueprint name",
