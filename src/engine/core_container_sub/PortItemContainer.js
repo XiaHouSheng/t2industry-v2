@@ -6,12 +6,6 @@ export class PortItemContainer extends MachineContainer {
     super(machine);
   }
 
-  renderBody() {
-    this.renderPorts(this.machine);
-    this.renderBackground();
-    this.renderUI();
-  }
-
   renderRecipeUI() {
     const mask = this.machine.mask || this.machine.defaultMask;
     for (let row = 0; row < mask.length; row++) {
