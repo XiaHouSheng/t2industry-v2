@@ -35,6 +35,9 @@ export default {
     resetView: "复位视图",
     clearConfirm: "确定清空当前蓝图？",
     lang: "切换语言",
+    githubV2: "T2industry v2 仓库",
+    coreEngine: "T2EngineCore",
+    githubEngine: "T2EngineCore 核心引擎仓库",
   },
   placebar: {
     categoryDefault: "默认",

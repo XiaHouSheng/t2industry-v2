@@ -35,6 +35,9 @@ export default {
     resetView: "Reset View",
     clearConfirm: "Clear the current blueprint?",
     lang: "Switch language",
+    githubV2: "T2industry v2 repository",
+    coreEngine: "T2EngineCore",
+    githubEngine: "T2EngineCore core engine repository",
   },
   placebar: {
     categoryDefault: "Default",
