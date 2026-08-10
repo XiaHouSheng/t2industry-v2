@@ -75,11 +75,12 @@ function setNowRecipe(machine, recipeId) {
   machine.now_recipe = recipeId;
 }
 
+function getModes(machine) {
+  return machine.modes ?? ["default"];
+}
+
 function getNowMode(machine) {
   return machine.now_mode;
-}
-function setNowMode(machine, mode) {
-  machine.now_mode = mode;
 }
 
 /* ============================== 端口配方图标 ============================== */
@@ -137,7 +138,7 @@ export {
   getNowRecipe,
   setNowRecipe,
   getNowMode,
-  setNowMode,
+  getModes,
   // 端口配方图标
   getPortRecipeIcon,
   setPortRecipeIcon,

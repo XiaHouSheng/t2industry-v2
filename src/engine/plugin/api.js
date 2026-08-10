@@ -30,7 +30,7 @@ export {
   getNowRecipe,
   setNowRecipe,
   getNowMode,
-  setNowMode,
+  getModes,
   getPortRecipeIcon,
   setPortRecipeIcon,
   getMachineObject,
@@ -60,6 +60,7 @@ export {
   deleteMachine,
   rotateMachine,
   rotateMachineByCenter,
+  switchMachineMode,
 } from "../core_sub/Machine.js";
 
 // 传送带操作

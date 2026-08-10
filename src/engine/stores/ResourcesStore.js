@@ -22,6 +22,9 @@ export const useResourcesStore = defineStore("resourcesStore", () => {
   // cube 机器（gridWidth === gridHeight）anchor 自动居中
   const machines = {};
 
+  // machine_masks：从 configs/machine_mask_config.json 中提取的机器 mask 配置，按 machine.id 索引
+  const machine_masks = {};
+
   // textures：public/textures/ 下所有 PNG，key = 文件名(不含扩展名)
   const textures = {};
 
@@ -164,7 +167,6 @@ export const useResourcesStore = defineStore("resourcesStore", () => {
           { x: 0.5, y: 0.5 },
           { x: 0.5, y: 0.5 },
         ],
-        mask: null,
       };
     }
   }
@@ -233,18 +235,27 @@ export const useResourcesStore = defineStore("resourcesStore", () => {
   }
 
   /**
-   * 从 machines.json 配置向 machines 注入 anchor 和 mask
+   * 从 machines.json 配置向 machines 注入 anchor
    * 跳过黑名单中的机器
-   * @param {Record<string, {id, anchor?, mask?}>} configMap
+   * @param {Record<string, {id, anchor?}>} configMap
    */
   function injectMachineAnchorMask(configMap) {
     for (const [key, cfg] of Object.entries(configMap)) {
       if (black_list_machine.includes(key)) continue;
       if (machines[cfg.id]) {
         if (cfg.anchor) machines[cfg.id].anchor = cfg.anchor;
-        if (cfg.mask) machines[cfg.id].mask = cfg.mask;
       }
     }
+  }
+
+  /**
+   * 从 machine_mask_config.json 配置注入 machine_masks
+   * 结构：{ 机器id: { mask: { mode: [...] }, port_recipe_icon: { mode: {...} } } }
+   * @param {Record<string, {mask?, port_recipe_icon?}>} configMap
+   */
+  function setMachineMasks(configMap) {
+    Object.keys(machine_masks).forEach((k) => delete machine_masks[k]);
+    Object.assign(machine_masks, configMap);
   }
 
   /**
@@ -264,6 +275,7 @@ export const useResourcesStore = defineStore("resourcesStore", () => {
     items,
     recipes,
     machines,
+    machine_masks,
     textures,
     machineIcons,
     machineOverlays,
@@ -284,6 +296,7 @@ export const useResourcesStore = defineStore("resourcesStore", () => {
     setMachineOverlay,
     setSpriteSheets,
     injectMachineAnchorMask,
+    setMachineMasks,
     setPortSheets,
     black_list_machine,
   };

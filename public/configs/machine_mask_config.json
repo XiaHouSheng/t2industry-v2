@@ -1,0 +1,1274 @@
+{
+  "cmpt_mc_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "dismantler_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "po.right.po1"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "po1": null
+      }
+    }
+  },
+  "filling_pd_mc_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null
+      }
+    }
+  },
+  "furnance_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ],
+      "liquid": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "po.right.po1"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null,
+        "po1": null
+      }
+    }
+  },
+  "gas_reactor_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma",
+          "ma",
+          "po.right.po1"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi2",
+          "ma",
+          "ma",
+          "ma",
+          "po.right.po2"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null,
+        "po1": null,
+        "pi2": null,
+        "po2": null
+      }
+    }
+  },
+  "grinder_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "liquid_cleaner_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null
+      }
+    }
+  },
+  "liquid_purifier_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "pi.left.pi1"
+        ],
+        [
+          "po.left.po1",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "pi.left.pi2"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null,
+        "po1": null,
+        "pi2": null
+      }
+    }
+  },
+  "mix_pool_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma",
+          "ma",
+          "po.right.po1"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi2",
+          "ma",
+          "ma",
+          "ma",
+          "po.right.po2"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null,
+        "po1": null,
+        "pi2": null,
+        "po2": null
+      }
+    }
+  },
+  "mix_pool_2": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "ma"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "po.right.po1"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi2",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "po.right.po2"
+        ],
+        [
+          "ma",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null,
+        "po1": null,
+        "pi2": null,
+        "po2": null
+      }
+    }
+  },
+  "phase_trans_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "pi.down.pi1",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi2",
+          "ma",
+          "ma",
+          "ma",
+          "po.right.po1"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi3",
+          "ma",
+          "ma",
+          "ma",
+          "po.right.po2"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null,
+        "pi2": null,
+        "po1": null,
+        "pi3": null,
+        "po2": null
+      }
+    }
+  },
+  "phase_trans_2": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "bi.down",
+          "pi.down.pi1",
+          "bi.down",
+          "ma"
+        ],
+        [
+          "pi.right.pi2",
+          "ma",
+          "ma",
+          "ma",
+          "po.right.po1"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi3",
+          "ma",
+          "ma",
+          "ma",
+          "po.right.po2"
+        ],
+        [
+          "ma",
+          "bo.down",
+          "ma",
+          "bo.down",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null,
+        "pi2": null,
+        "po1": null,
+        "pi3": null,
+        "po2": null
+      }
+    }
+  },
+  "planter_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "power_sta_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "seedcol_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "shaper_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "thickener_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "tools_asm_mc_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "winder_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "xiranite_oven_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "bi.down",
+          "ma",
+          "bi.down",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "bo.down",
+          "ma",
+          "bo.down",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null
+      }
+    }
+  },
+  "source_pile_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "base_segment_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "gas_disperser_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "pi.up.pi1",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null
+      }
+    }
+  },
+  "power_pile_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "storage_box_1": {
+    "mask": {
+      "default": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "warehouse_output_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "bo.down.bo1",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "bo1": null
+      }
+    }
+  },
+  "warehouse_input_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "bi.up",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "liquid_tank_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null
+      }
+    }
+  },
+  "concealed_pipe_in_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null
+      }
+    }
+  },
+  "concealed_pipe_out": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "po.right"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {}
+    }
+  },
+  "concealed_pipe_in_muti_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi2",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null,
+        "pi2": null
+      }
+    }
+  },
+  "concealed_pipe_out_muti_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "po.right.po1"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "po.right.po2"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "po1": null,
+        "po2": null
+      }
+    }
+  },
+  "protocol_core_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "ma"
+        ],
+        [
+          "bo.left.bo1",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "bo.right.bo2"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.left.bo3",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "bo.right.bo4"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.left.bo5",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "bo.right.bo6"
+        ],
+        [
+          "ma",
+          "bi.up",
+          "bi.up",
+          "bi.up",
+          "bi.up",
+          "bi.up",
+          "bi.up",
+          "bi.up",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "bo1": null,
+        "bo2": null,
+        "bo3": null,
+        "bo4": null,
+        "bo5": null,
+        "bo6": null
+      }
+    }
+  },
+  "gas_tank_1": {
+    "mask": {
+      "default": [
+        [
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ]
+    },
+    "port_recipe_icon": {
+      "default": {
+        "pi1": null
+      }
+    }
+  }
+}

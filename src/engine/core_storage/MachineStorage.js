@@ -1,4 +1,5 @@
 import { pixelToGridNoneOffset } from "../core_middleware/PositionConvert.js";
+import { getMaskForType } from "../core_middleware/MachineMaskUtil.js";
 import { useStorageStore } from "../stores/StorageStore.js";
 import { useMachineStore } from "../stores/MachineStore.js";
 
@@ -26,9 +27,11 @@ function mapMachineAreaWithType(machine_type, func) {
   const machineStore = useMachineStore();
   const machine = machineStore.machineTypes[machine_type];
   if (!machine) return;
+  const mask = getMaskForType(machine_type);
+  if (!mask) return;
   for (let i = 0; i < machine.gridWidth; i++) {
     for (let j = 0; j < machine.gridHeight; j++) {
-      func(i, j, machine.mask[j][i]);
+      func(i, j, mask[j][i]);
     }
   }
 }

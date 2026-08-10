@@ -31,6 +31,7 @@ function applyBitmapTextureConfig(texture) {
 const CONFIG_PATHS = {
   machines: `${BASE}configs/machines.json`,
   machine_config: `${BASE}configs/machines.json`,
+  machine_mask_config: `${BASE}configs/machine_mask_config.json`,
   data: `${BASE}configs/data.json`,
   iconsheet: `${BASE}resources/icons.webp`,
 };
@@ -176,17 +177,26 @@ export async function loadDataConfigs() {
     // machine ←→ recipe 关联注入
     resStore.injectMachineRecipeIds();
 
-    // 加载 machines_1_4.json 并注入 anchor / mask
+    // 加载 machines.json 并注入 anchor / 完整机器定义
     try {
       const machinesConfig = await fetchJSON(CONFIG_PATHS.machine_config);
-      // 注入 anchor / mask → ResourcesStore.machines
+      // 注入 anchor → ResourcesStore.machines
       resStore.injectMachineAnchorMask(machinesConfig);
       // 注入完整机器定义 → MachineStore.machineTypes
       const machineStore = useMachineStore();
       machineStore.injectFromConfig(machinesConfig, resStore.black_list_machine);
-      console.log("[Loader] machines_1_4 config injected");
+      console.log("[Loader] machines config injected");
     } catch (err) {
-      console.warn("[Loader] machines_1_4 not found:", err.message);
+      console.warn("[Loader] machines not found:", err.message);
+    }
+
+    // 加载 machine_mask_config.json → ResourcesStore.machine_masks
+    try {
+      const maskConfig = await fetchJSON(CONFIG_PATHS.machine_mask_config);
+      resStore.setMachineMasks(maskConfig);
+      console.log("[Loader] machine_mask_config injected");
+    } catch (err) {
+      console.warn("[Loader] machine_mask_config not found:", err.message);
     }
 
     console.log(resStore.machines);

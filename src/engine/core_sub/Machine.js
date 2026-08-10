@@ -5,8 +5,10 @@ import {
 } from "../core_storage/MachineStorage.js";
 import { drawMachine, dropDrawMachine } from "../core_stage/MachineStage.js";
 import { useMachineStore } from "../stores/MachineStore.js";
+import { useStorageStore } from "../stores/StorageStore.js";
 import { nanoid } from "nanoid";
 import { rotateMask } from "../core_middleware/MaskUtil.js";
+import { resolveMachineMaskData } from "../core_middleware/MachineMaskUtil.js";
 /**
  * 创建机器
  * @param {
@@ -41,7 +43,10 @@ function createMachine(typename) {
   machine.rotation = 0;
   machine.port_offset_index = 0;
   machine.now_recipe = null;
-  machine.now_mode = null;
+  // 优先使用机器类型配置中的 now_mode，缺失时回退 default
+  machine.now_mode = machine.now_mode ?? "default";
+  // 从 machine_mask_config 按 type + mode 注入 mask / port_recipe_icon
+  resolveMachineMaskData(machine);
   return machine;
 }
 
@@ -82,6 +87,30 @@ function rotateMachineByCenter(machine, x, y) {
   return machine;
 }
 
+// 切换机器模式
+function switchMachineMode(machine, mode) {
+  const storageStore = useStorageStore();
+  const wasPlaced = storageStore.machines[machine.id] === machine;
+  // 已放置：先按旧 mask 清除占用与视觉
+  if (wasPlaced) {
+    const container = dropMachine(machine);
+    dropDrawMachine(container);
+  }
+  machine.now_mode = mode;
+  // 从 machine_mask_config 按 type + mode 重新注入 mask / port_recipe_icon
+  resolveMachineMaskData(machine);
+  // 若 mask 尺寸变化，同步 gridWidth / gridHeight
+  if (machine.mask && machine.mask.length > 0) {
+    machine.gridHeight = machine.mask.length;
+    machine.gridWidth = machine.mask[0].length;
+  }
+  // 重新放置：按新 mask 重建占用与渲染
+  if (wasPlaced) {
+    placeMachine(machine, machine.gridX, machine.gridY);
+  }
+  return machine;
+}
+
 function deleteMachine(machine) {
   dropDrawMachine(dropMachine(machine));
   return machine;
@@ -93,4 +122,5 @@ export {
   deleteMachine,
   rotateMachine,
   rotateMachineByCenter,
+  switchMachineMode,
 };
