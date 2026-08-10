@@ -44,3 +44,5 @@ jobs:
         source: "dist/*"
 
         target: "/www/wwwroot/t2industry-v2"
+
+        strip_components: 1
