@@ -175,16 +175,22 @@ function applyRecipe(recipeId) {
   // 1. 更新当前配方
   setNowRecipe(machine, recipeId);
 
-  // 2. 依据液体/气体输出设置输出端口默认图标（单输出 → po1/po2 相同；双输出 → 依次分配）
+  // 2. 依据液体/气体输出设置输出端口默认图标：按 port_recipe_icon 现有键分配
+  //    （排除 pi 输入端口；单输出 → 各端口相同；多输出 → 依次分配）
   const fluidOuts = Object.keys(recipe.out || {}).filter(
     (id) => id.startsWith("gas_") || id.startsWith("liquid_"),
   );
-  if (fluidOuts.length === 1) {
-    setPortRecipeIcon(machine, "po1", fluidOuts[0]);
-    setPortRecipeIcon(machine, "po2", fluidOuts[0]);
-  } else if (fluidOuts.length >= 2) {
-    setPortRecipeIcon(machine, "po1", fluidOuts[0]);
-    setPortRecipeIcon(machine, "po2", fluidOuts[1]);
+  const outPortKeys = Object.keys(machine.port_recipe_icon || {}).filter(
+    (key) => portType(key) !== "pi",
+  );
+  if (outPortKeys.length && fluidOuts.length) {
+    outPortKeys.forEach((portId, i) => {
+      setPortRecipeIcon(
+        machine,
+        portId,
+        fluidOuts[Math.min(i, fluidOuts.length - 1)],
+      );
+    });
   }
 
   // 3. 刷新机器容器渲染
