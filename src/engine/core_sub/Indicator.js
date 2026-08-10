@@ -105,6 +105,7 @@ function onStartMoveMachine(gridX, gridY) {
     { gridWidth: machine.gridWidth, gridHeight: machine.gridHeight },
     machine.anchor[machine.rotation],
     false,
+    machine
   );
   S.metaBackup.machines[machine.id] = { ...machine };
   S.metaRotateMove.machines[machine.id] = { ...machine };

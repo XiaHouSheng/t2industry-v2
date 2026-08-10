@@ -35,12 +35,24 @@ class IndicatorGraphic extends Container {
 
     this.#drawBeltPipePortIndicator(pipe_or_belt_entity);
     this.#drawMachinePortIndicator(machine_entity, cellSize);
+    this.#drawPowerPileArea(machine_entity);
   }
 
   moveToGrid(position) {
     const { gridX, gridY } = position;
     this.x = gridX * this.cellWidth - this.cellWidth * 0.5;
     this.y = gridY * this.cellHeight - this.cellHeight * 0.5;
+  }
+
+  #drawPowerPileArea(machine_entity) {
+    if (!machine_entity || machine_entity.type != "power_pile_1") return;
+    const graphics = new Graphics();
+    const width = 12 * this.cellWidth;
+    const height = 12 * this.cellHeight;
+    graphics.pivot.set(width * 0.5, height * 0.5);
+    graphics.roundRect(this.cellWidth, this.cellHeight, width, height, 2);
+    graphics.stroke();
+    this.addChild(graphics);
   }
 
   #drawBeltPipePortIndicator(entity) {
