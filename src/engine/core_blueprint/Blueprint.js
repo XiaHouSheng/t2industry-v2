@@ -8,8 +8,8 @@ function setBlueprintCallbacks(
   onInit,
   onSelectBlueprint
 ) {
-  callbackOnInit = onInit || (() => {});
-  callbackOnSelectBlueprint = onSelectBlueprint || (() => {});
+  callbackOnInit = onInit;
+  callbackOnSelectBlueprint = onSelectBlueprint;
 }
 
 function createBlueprint(name, id, content) {
@@ -181,11 +181,18 @@ function addBlueprintLocal(name) {
   selectBlueprintLocal(blueprint.id);
 }
 
+function changeBlueprintNameLocal(id, name) {
+  const storageStore = useStorageStore();
+  if (!id || !storageStore.blueprints[id]) return;
+  storageStore.blueprints[id].name = name;
+}
+
 export {
   createBlueprint,
   deleteBlueprintLocal,
   selectBlueprintLocal,
   clearBlueprintLocal,
+  changeBlueprintNameLocal,
   addBlueprintLocal,
   saveBlueprintLocal,
   loadBlueprintFromFile,

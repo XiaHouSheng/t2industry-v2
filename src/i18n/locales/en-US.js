@@ -42,6 +42,11 @@ export default {
   placebar: {
     categoryDefault: "Default",
     node: "Nodes",
+    produce: "Produce",
+    smelt: "Smelt",
+    react: "React",
+    storage: "Storage",
+    special: "Special",
     machineTitle: "{name}（{w}×{h}）",
   },
   statusbar: {

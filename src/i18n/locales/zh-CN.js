@@ -42,6 +42,11 @@ export default {
   placebar: {
     categoryDefault: "默认",
     node: "节点",
+    produce: "生产",
+    smelt: "冶炼",
+    react: "反应",
+    storage: "存储",
+    special: "特殊",
     machineTitle: "{name}（{w}×{h}）",
   },
   statusbar: {

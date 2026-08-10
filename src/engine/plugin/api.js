@@ -127,6 +127,7 @@ export {
   deleteBlueprintLocal,
   selectBlueprintLocal,
   addBlueprintLocal,
+  changeBlueprintNameLocal,
   loadBlueprintFromFile,
   exportBlueprintToFile,
   importBlueprintFromData,

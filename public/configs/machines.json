@@ -40,7 +40,8 @@
       "copper_enr_cmpt",
       "copper_enr2_cmpt"
     ],
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "produce"
   },
   "dismantler_1": {
     "id": "dismantler_1",
@@ -93,7 +94,8 @@
     ],
     "port_recipe_icon": {
       "po1": null
-    }
+    },
+    "category": "produce"
   },
   "filling_pd_mc_1": {
     "id": "filling_pd_mc_1",
@@ -158,7 +160,8 @@
     ],
     "port_recipe_icon": {
       "pi1": null
-    }
+    },
+    "category": "produce"
   },
   "furnance_1": {
     "id": "furnance_1",
@@ -184,7 +187,7 @@
       [
         "pi.right.pi1",
         "ma",
-        "ma"
+        "po.right.po1"
       ],
       [
         "bo.down",
@@ -220,8 +223,10 @@
       "copper_nugget"
     ],
     "port_recipe_icon": {
-      "pi1": null
-    }
+      "pi1": null,
+      "po1": null
+    },
+    "category": "smelt"
   },
   "gas_reactor_1": {
     "id": "gas_reactor_1",
@@ -283,7 +288,8 @@
       "po1": null,
       "pi2": null,
       "po2": null
-    }
+    },
+    "category": "react"
   },
   "grinder_1": {
     "id": "grinder_1",
@@ -331,7 +337,8 @@
       "iron_powder",
       "copper_powder"
     ],
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "smelt"
   },
   "liquid_cleaner_1": {
     "id": "liquid_cleaner_1",
@@ -372,7 +379,8 @@
     ],
     "port_recipe_icon": {
       "pi1": null
-    }
+    },
+    "category": "react"
   },
   "liquid_purifier_1": {
     "id": "liquid_purifier_1",
@@ -438,7 +446,8 @@
       "pi1": null,
       "po1": null,
       "pi2": null
-    }
+    },
+    "category": "react"
   },
   "mix_pool_1": {
     "id": "mix_pool_1",
@@ -507,7 +516,8 @@
       "po1": null,
       "pi2": null,
       "po2": null
-    }
+    },
+    "category": "react"
   },
   "mix_pool_2": {
     "id": "mix_pool_2",
@@ -581,7 +591,8 @@
       "po1": null,
       "pi2": null,
       "po2": null
-    }
+    },
+    "category": "react"
   },
   "phase_trans_1": {
     "id": "phase_trans_1",
@@ -655,7 +666,8 @@
       "po1": null,
       "pi3": null,
       "po2": null
-    }
+    },
+    "category": "react"
   },
   "phase_trans_2": {
     "id": "phase_trans_2",
@@ -727,7 +739,8 @@
       "po1": null,
       "pi3": null,
       "po2": null
-    }
+    },
+    "category": "react"
   },
   "planter_1": {
     "id": "planter_1",
@@ -789,7 +802,8 @@
       "plant_bbflower_1",
       "plant_grass_2"
     ],
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "produce"
   },
   "power_sta_1": {
     "id": "power_sta_1",
@@ -824,7 +838,8 @@
       "power_proc_battery_4",
       "power_proc_battery_5"
     ],
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "smelt"
   },
   "seedcol_1": {
     "id": "seedcol_1",
@@ -886,7 +901,8 @@
       "plant_bbflower_seed_1",
       "plant_grass_seed_2"
     ],
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "produce"
   },
   "shaper_1": {
     "id": "shaper_1",
@@ -929,7 +945,8 @@
       "copper_enr_bottle",
       "copper_jar"
     ],
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "produce"
   },
   "thickener_1": {
     "id": "thickener_1",
@@ -989,7 +1006,8 @@
       "quartz_enr_powder",
       "iron_enr_powder"
     ],
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "smelt"
   },
   "tools_asm_mc_1": {
     "id": "tools_asm_mc_1",
@@ -1053,7 +1071,8 @@
       "proc_battery_5",
       "proc_bomb_1"
     ],
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "produce"
   },
   "winder_1": {
     "id": "winder_1",
@@ -1113,7 +1132,8 @@
       "equip_script_4_2",
       "equip_script_4_3"
     ],
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "produce"
   },
   "xiranite_oven_1": {
     "id": "xiranite_oven_1",
@@ -1174,7 +1194,8 @@
     ],
     "port_recipe_icon": {
       "pi1": null
-    }
+    },
+    "category": "smelt"
   },
   "source_pile_1": {
     "name": "存取线源段",
@@ -1217,7 +1238,8 @@
       ]
     ],
     "id": "source_pile_1",
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "storage"
   },
   "base_segment_1": {
     "name": "存储线基段",
@@ -1276,7 +1298,8 @@
       ]
     ],
     "id": "base_segment_1",
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "storage"
   },
   "gas_disperser_1": {
     "name": "气体散布机",
@@ -1312,7 +1335,8 @@
     "id": "gas_disperser_1",
     "port_recipe_icon": {
       "pi1": null
-    }
+    },
+    "category": "react"
   },
   "power_pile_1": {
     "name": "供电桩",
@@ -1339,7 +1363,8 @@
       ]
     ],
     "id": "power_pile_1",
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "storage"
   },
   "storage_box_1": {
     "name": "协议存储箱",
@@ -1373,7 +1398,8 @@
       ]
     ],
     "id": "storage_box_1",
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "storage"
   },
   "warehouse_output_1": {
     "name": "仓库取货口",
@@ -1399,7 +1425,8 @@
     "id": "warehouse_output_1",
     "port_recipe_icon": {
       "bo1": null
-    }
+    },
+    "category": "storage"
   },
   "warehouse_input_1": {
     "name": "仓库存货口",
@@ -1423,7 +1450,8 @@
       ]
     ],
     "id": "warehouse_input_1",
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "storage"
   },
   "liquid_tank_1": {
     "name": "储液罐",
@@ -1459,7 +1487,8 @@
     "id": "liquid_tank_1",
     "port_recipe_icon": {
       "pi1": null
-    }
+    },
+    "category": "storage"
   },
   "concealed_pipe_in_1": {
     "name": "暗管入口",
@@ -1495,7 +1524,8 @@
     "id": "concealed_pipe_in_1",
     "port_recipe_icon": {
       "pi1": null
-    }
+    },
+    "category": "storage"
   },
   "concealed_pipe_out": {
     "name": "暗管出口",
@@ -1529,7 +1559,8 @@
       ]
     ],
     "id": "concealed_pipe_out",
-    "port_recipe_icon": {}
+    "port_recipe_icon": {},
+    "category": "storage"
   },
   "concealed_pipe_in_muti_1": {
     "name": "多口暗管入口",
@@ -1576,7 +1607,8 @@
     "port_recipe_icon": {
       "pi1": null,
       "pi2": null
-    }
+    },
+    "category": "storage"
   },
   "concealed_pipe_out_muti_1": {
     "name": "多口暗管出口",
@@ -1623,7 +1655,8 @@
     "port_recipe_icon": {
       "po1": null,
       "po2": null
-    }
+    },
+    "category": "storage"
   },
   "protocol_core_1": {
     "name": "协议核心",
@@ -1748,7 +1781,8 @@
       "bo4": null,
       "bo5": null,
       "bo6": null
-    }
+    },
+    "category": "special"
   },
   "gas_tank_1": {
     "name": "储气罐",
@@ -1784,6 +1818,7 @@
     "id": "gas_tank_1",
     "port_recipe_icon": {
       "pi1": null
-    }
+    },
+    "category": "storage"
   }
 }

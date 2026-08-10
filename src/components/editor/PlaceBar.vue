@@ -20,7 +20,7 @@ import { useEditorStore, TOOL_MACHINE, TOOL_NODE } from "@/stores/EditorStore.js
 
 const BASE = import.meta.env.BASE_URL;
 
-const { t } = useI18n();
+const { t, te } = useI18n();
 const editorStore = useEditorStore();
 const machineStore = useMachineStore();
 const resourcesStore = useResourcesStore();
@@ -28,8 +28,9 @@ const resourcesStore = useResourcesStore();
 /* ---------- 机器 ---------- */
 
 function categoryLabel(cat) {
-  // 分类显示名：后续 machines.json 增加 category 字段后在此扩展
-  return cat === "default" ? t("placebar.categoryDefault") : cat;
+  // 分类显示名：default 无分类映射 categoryDefault，其余按分类名查 placebar.* 翻译
+  const key = cat === "default" ? "categoryDefault" : cat;
+  return te(`placebar.${key}`) ? t(`placebar.${key}`) : cat;
 }
 
 /** 机器按 category 分组，无 category 时归 "default" */
