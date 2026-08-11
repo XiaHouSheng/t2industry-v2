@@ -71,6 +71,7 @@ export default {
       default: "默认",
       gas: "气体",
       liquid: "液体",
+      solid: "固体",
     },
     currentRecipe: "当前配方",
     noRecipe: "无配方",

@@ -71,6 +71,7 @@ export default {
       default: "Default",
       gas: "Gas",
       liquid: "Liquid",
+      solid: "Solid",
     },
     currentRecipe: "Current Recipe",
     noRecipe: "No recipe",
