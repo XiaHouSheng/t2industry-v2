@@ -1,3 +1,4 @@
+import { Container } from "pixi.js";
 import { MachineContainer } from "../core_container_sub/MachineContainer";
 import { parseMaskCell } from "../core_middleware/MaskUtil";
 
@@ -27,24 +28,34 @@ export class PortRecipeContainer extends MachineContainer {
     const fluidOuts = Object.keys(recipe.out || {}).filter(
       (id) => id.startsWith("gas_") || id.startsWith("liquid_"),
     );
-    if (fluidOuts.length === 0) return;
 
-    // 3. 先写 port_recipe_icon：单输出 → po1/po2 相同 icon；双输出 → 依次分配
-    //    已存在的配置不覆盖（保留手动指定的端口图标）
+    // 3. 先写 port_recipe_icon：按当前机器实际拥有的端口键分配
+    //    已存在的配置不覆盖（保留手动指定的端口图标，允许手动设 null 清除）
     if (!machine.port_recipe_icon) machine.port_recipe_icon = {};
-    if (fluidOuts.length === 1) {
-      if (!machine.port_recipe_icon["po1"] || force)
-        machine.port_recipe_icon["po1"] = fluidOuts[0];
-      if (!machine.port_recipe_icon["po2"] || force)
-        machine.port_recipe_icon["po2"] = fluidOuts[0];
-    } else {
-      if (!machine.port_recipe_icon["po1"] || force)
-        machine.port_recipe_icon["po1"] = fluidOuts[0];
-      if (!machine.port_recipe_icon["po2"] || force)
-        machine.port_recipe_icon["po2"] = fluidOuts[1];
+    const outPortKeys = Object.keys(machine.port_recipe_icon).filter(
+      (key) => !key.startsWith("pi"),
+    );
+    if (fluidOuts.length && outPortKeys.length) {
+      outPortKeys.forEach((portId, i) => {
+        if (!machine.port_recipe_icon[portId] || force) {
+          machine.port_recipe_icon[portId] =
+            fluidOuts[Math.min(i, fluidOuts.length - 1)];
+        }
+      });
     }
 
-    // 4. 渲染：遍历 mask，带端口 id 且有图标的格子画出 item icon
+    // 4. 重建 recipeContainer：先销毁旧节点（含中间配方图标 + 旧端口图标），
+    //    再重绘中间配方图标，最后画端口图标。确保手动设为 null 时旧图标立即被清掉。
+    if (this.recipeContainer) {
+      this.uiContainer.removeChild(this.recipeContainer);
+      this.recipeContainer.destroy({ children: true });
+    }
+    this.recipeContainer = new Container();
+    this.uiContainer.addChild(this.recipeContainer);
+    // 重绘中间的配方 in/out 图标
+    this.renderRecipeUI();
+
+    // 5. 画端口图标：即使 itemId 为 null 也不跳过，由重建阶段保证清空
     const mask = machine.mask || machine.defaultMask;
     for (let row = 0; row < mask.length; row++) {
       for (let col = 0; col < mask[row].length; col++) {
