@@ -172,10 +172,12 @@ function assignPort(key, itemId) {
 /** 可选模式列表（来自机器配置 modes 字段） */
 const modes = computed(() => getModes(props.machine));
 
-/** 当前模式（缺省回退第一个） */
-const currentMode = computed(
-  () => getNowMode(props.machine) || modes.value[0] || "default",
-);
+/** 当前模式（优先机器实例的 now_mode；不在可选列表时兜底第一个，避免无 default 配置时无高亮） */
+const currentMode = computed(() => {
+  const now = getNowMode(props.machine);
+  if (modes.value.includes(now)) return now;
+  return modes.value[0] || "default";
+});
 
 function switchMode(mode) {
   if (mode === currentMode.value) return;
@@ -273,7 +275,7 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
               :class="{ active: m === currentMode }"
               @click="switchMode(m)"
             >
-              {{ m }}
+              {{ t(`recipeModal.modeNames.${m}`, { defaultValue: m }) }}
             </button>
           </div>
         </section>

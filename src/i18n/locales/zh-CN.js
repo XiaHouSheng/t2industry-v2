@@ -67,6 +67,11 @@ export default {
   recipeModal: {
     headSub: "配方选择",
     modes: "模式",
+    modeNames: {
+      default: "默认",
+      gas: "气体",
+      liquid: "液体",
+    },
     currentRecipe: "当前配方",
     noRecipe: "无配方",
     outputPortIcon: "输出端口图标",

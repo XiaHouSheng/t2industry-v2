@@ -67,6 +67,11 @@ export default {
   recipeModal: {
     headSub: "Recipe Selection",
     modes: "Modes",
+    modeNames: {
+      default: "Default",
+      gas: "Gas",
+      liquid: "Liquid",
+    },
     currentRecipe: "Current Recipe",
     noRecipe: "No recipe",
     outputPortIcon: "Output Port Icons",
