@@ -13,6 +13,7 @@ import {
   clearBlueprintLocal,
   deleteBlueprintLocal,
   selectBlueprintLocal,
+  changeBlueprintNameLocal,
   exportBlueprintToFile,
   loadBlueprintFromFile,
   saveBlueprintLocal,
@@ -60,6 +61,16 @@ function onNewBlueprint() {
   if (name && name.trim()) {
     addBlueprintLocal(name.trim());
     closeBp();
+  }
+}
+
+function onRenameBp(bp) {
+  const name = window.prompt(
+    t("topbar.renameBlueprintPrompt", { name: bp.name }),
+    bp.name,
+  );
+  if (name && name.trim()) {
+    changeBlueprintNameLocal(bp.id, name.trim());
   }
 }
 
@@ -155,6 +166,13 @@ function toggleLang() {
           <button class="bp-select" @click="onSelectBp(bp.id)">
             <span class="bp-dot"></span>
             <span class="bp-item-name">{{ bp.name }}</span>
+          </button>
+          <button
+            class="bp-rename"
+            :title="t('topbar.renameBlueprint')"
+            @click="onRenameBp(bp)"
+          >
+            ✎
           </button>
           <button
             class="bp-del"
@@ -410,8 +428,30 @@ function toggleLang() {
   cursor: pointer;
 }
 
-.bp-item:hover .bp-del {
+.bp-rename {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-faint);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.bp-item:hover .bp-del,
+.bp-item:hover .bp-rename {
   display: flex;
+}
+
+.bp-rename:hover {
+  background: var(--accent-dim);
+  color: var(--accent-strong);
 }
 
 .bp-del:hover {

@@ -25,6 +25,8 @@ export default {
     newBlueprintPrompt: "蓝图名称",
     newBlueprintDefault: "新蓝图",
     deleteBlueprint: "删除蓝图",
+    renameBlueprint: "重命名蓝图",
+    renameBlueprintPrompt: "重命名蓝图「{name}」",
     deleteConfirm: "确定删除蓝图「{name}」？",
     deleteLastConfirm: "只剩最后一个蓝图，无法删除；将清空其内容，确定继续？",
     tools: "工具",
@@ -64,6 +66,7 @@ export default {
   },
   recipeModal: {
     headSub: "配方选择",
+    modes: "模式",
     currentRecipe: "当前配方",
     noRecipe: "无配方",
     outputPortIcon: "输出端口图标",

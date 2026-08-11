@@ -147,7 +147,8 @@
       ]
     },
     "port_recipe_icon": {
-      "default": {
+      "default": {},
+      "liquid": {
         "pi1": null,
         "po1": null
       }

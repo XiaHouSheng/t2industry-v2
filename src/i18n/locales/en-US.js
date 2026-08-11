@@ -25,6 +25,8 @@ export default {
     newBlueprintPrompt: "Blueprint name",
     newBlueprintDefault: "New Blueprint",
     deleteBlueprint: "Delete blueprint",
+    renameBlueprint: "Rename blueprint",
+    renameBlueprintPrompt: "Rename blueprint 「{name}」",
     deleteConfirm: "Delete blueprint 「{name}」?",
     deleteLastConfirm: "This is the last blueprint and cannot be deleted; its content will be cleared. Continue?",
     tools: "Tools",
@@ -64,6 +66,7 @@ export default {
   },
   recipeModal: {
     headSub: "Recipe Selection",
+    modes: "Modes",
     currentRecipe: "Current Recipe",
     noRecipe: "No recipe",
     outputPortIcon: "Output Port Icons",

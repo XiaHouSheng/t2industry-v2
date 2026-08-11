@@ -16,6 +16,9 @@ import {
   getPortRecipeIcon,
   setNowRecipe,
   setPortRecipeIcon,
+  getModes,
+  getNowMode,
+  switchMachineMode,
   getMachineObject,
 } from "@/engine/plugin/api.js";
 import SpriteIcon from "./SpriteIcon.vue";
@@ -164,34 +167,57 @@ function assignPort(key, itemId) {
   else container?.refreshRecipeUI?.();
 }
 
+/* ---------- 模式切换 ---------- */
+
+/** 可选模式列表（来自机器配置 modes 字段） */
+const modes = computed(() => getModes(props.machine));
+
+/** 当前模式（缺省回退第一个） */
+const currentMode = computed(
+  () => getNowMode(props.machine) || modes.value[0] || "default",
+);
+
+function switchMode(mode) {
+  if (mode === currentMode.value) return;
+  // 引擎已按新模式注入 mask / port_recipe_icon，面板直接跟随最新配置数据
+  switchMachineMode(props.machine, mode);
+  rightTab.value = "recipes";
+}
+
 /* ---------- 切换配方 ---------- */
 
-function applyRecipe(recipeId) {
-  if (recipeId === currentId.value) return;
-  const machine = props.machine;
-  const recipe = resourcesStore.recipes[recipeId];
+/**
+ * 依据液体/气体输出为现有输出端口键分配默认图标
+ * 按 port_recipe_icon 现有键分配（排除 pi 输入端口；单输出 → 各端口相同；多输出 → 依次分配）
+ */
+function applyDefaultPortIcons() {
+  const recipe = resourcesStore.recipes[currentId.value];
   if (!recipe) return;
-
-  // 1. 更新当前配方
-  setNowRecipe(machine, recipeId);
-
-  // 2. 依据液体/气体输出设置输出端口默认图标：按 port_recipe_icon 现有键分配
-  //    （排除 pi 输入端口；单输出 → 各端口相同；多输出 → 依次分配）
-  const fluidOuts = Object.keys(recipe.out || {}).filter(
-    (id) => id.startsWith("gas_") || id.startsWith("liquid_"),
-  );
-  const outPortKeys = Object.keys(machine.port_recipe_icon || {}).filter(
+  const fluidOuts = Object.keys(recipe.out || {}).filter(isFluid);
+  const outPortKeys = Object.keys(props.machine.port_recipe_icon || {}).filter(
     (key) => portType(key) !== "pi",
   );
   if (outPortKeys.length && fluidOuts.length) {
     outPortKeys.forEach((portId, i) => {
       setPortRecipeIcon(
-        machine,
+        props.machine,
         portId,
         fluidOuts[Math.min(i, fluidOuts.length - 1)],
       );
     });
   }
+}
+
+function applyRecipe(recipeId) {
+  if (recipeId === currentId.value) return;
+  const machine = props.machine;
+  if (!resourcesStore.recipes[recipeId]) return;
+
+  // 1. 更新当前配方
+  setNowRecipe(machine, recipeId);
+
+  // 2. 为当前输出端口键分配默认图标
+  applyDefaultPortIcons();
 
   // 3. 刷新机器容器渲染
   getMachineObject(machine.id)?.refreshRecipeUI?.();
@@ -235,6 +261,22 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
             ×
           </button>
         </header>
+
+        <!-- 模式切换 -->
+        <section v-if="modes.length > 1" class="mode-section">
+          <span class="sec-label">{{ t("recipeModal.modes") }}</span>
+          <div class="mode-tabs">
+            <button
+              v-for="m in modes"
+              :key="m"
+              class="mode-tab"
+              :class="{ active: m === currentMode }"
+              @click="switchMode(m)"
+            >
+              {{ m }}
+            </button>
+          </div>
+        </section>
 
         <!-- 当前配方 -->
         <section class="cur-section">
@@ -509,6 +551,44 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
   flex-direction: column;
   gap: 8px;
   padding: 0 14px;
+}
+
+/* ===== 模式切换 ===== */
+
+.mode-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 14px;
+}
+
+.mode-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mode-tab {
+  padding: 4px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-dim);
+  font-size: 11px;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.mode-tab:hover {
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+.mode-tab.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent-strong);
 }
 
 .cur-recipe {
