@@ -1,13 +1,8 @@
 import { useStorageStore } from "../stores/StorageStore.js";
-import {
-  placeMachine,
-} from "../core_sub/Machine.js";
-import {
-  placeBelt,
-} from "../core_sub/Belt.js";
-import {
-  placePipe,
-} from "../core_sub/Pipe.js";
+import { placeMachine } from "../core_sub/Machine.js";
+import { placeBelt } from "../core_sub/Belt.js";
+import { placePipe } from "../core_sub/Pipe.js";
+import { selectBlueprintLocal } from "../core_blueprint/Blueprint.js";
 import {
   drawMask,
   drawSelectBox,
@@ -55,6 +50,7 @@ const S = {
   pre_machine: null,
   nowPlaceNodeType: null, // 放置节点时记录 node 类型（split/merge/cross/default）
   pre_node: null, // 预创建的单节点对象（belt/pipe），用于预览和旋转
+  lastBlueprint: null, // 开始选择移动（非 copy）时的蓝图 id，取消时用于比对是否允许重建
 };
 
 // === 可视化控制 ===
@@ -117,8 +113,19 @@ function refreshHandleQueue() {
 }
 
 function rebuildIfSelectMoving() {
+
+  let detect_blueprint_conflict = true;
+  if (S.lastBlueprint != null) {
+    const storageStore = useStorageStore();
+    if (!storageStore.blueprints[S.lastBlueprint]) {
+      detect_blueprint_conflict = false;
+    }else if (storageStore.current_blueprint !== S.lastBlueprint) {
+      selectBlueprintLocal(S.lastBlueprint);
+    }
+  }
+
   // 复制模式原始实体仍在 storage，无需（也不应）重建
-  if (S.isSelectMoving && !S.is_select_copy) {
+  if (S.isSelectMoving && !S.is_select_copy && detect_blueprint_conflict) {
     Object.keys(S.metaBackup.machines).forEach((id) => {
       const m = S.metaBackup.machines[id];
       placeMachine(m, m.gridX, m.gridY);
@@ -135,6 +142,7 @@ function rebuildIfSelectMoving() {
   S.is_select_copy = false;
   S.isSelectMoving = false;
   S.metaBackup = { machines: {}, belts: {}, pipes: {} };
+  S.lastBlueprint = null;
 }
 
 function moveMasksToOffset(last_delta_x, last_delta_y) {

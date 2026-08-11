@@ -658,6 +658,12 @@ function onStartSelectMove(name, is_copy = false) {
   setSelectMoving(true);
 
   const storageStore = useStorageStore();
+  // 非 copy 移动：记录起始蓝图 id，取消时用于比对是否允许原位重建
+  if (!is_copy) {
+    S.lastBlueprint = storageStore.current_blueprint;
+  } else {
+    S.lastBlueprint = null;
+  }
   const cellWidth = storageStore.cellWidth;
   const cellHeight = storageStore.cellHeight;
 
