@@ -89,4 +89,21 @@ export default {
     clear: "Clear",
     noIcons: "No icons available",
   },
+  versionLog: {
+    title: "Release Notes",
+    current: "Current version",
+    noLogs: "No release notes yet",
+    close: "Got it",
+    logs: [
+      {
+        version: "0.1.0",
+        date: "2026-08-13",
+        notes: [
+          "Concealed pipe outlets now support picking any liquid as the port icon",
+          "Port icon candidates now filter out non-fluid machines with gas_/liquid_ prefixes",
+          "Integrated vite-plugin-version-mark for versioning and added a release notes popup",
+        ],
+      },
+    ],
+  },
 };

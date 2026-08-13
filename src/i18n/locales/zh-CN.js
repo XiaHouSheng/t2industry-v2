@@ -89,4 +89,21 @@ export default {
     clear: "清空",
     noIcons: "无可选图标",
   },
+  versionLog: {
+    title: "更新说明",
+    current: "当前版本",
+    noLogs: "暂无更新说明",
+    close: "我知道了",
+    logs: [
+      {
+        version: "0.1.0",
+        date: "2026-08-13",
+        notes: [
+          "暗管出口支持在面板中选择任意液体作为端口图标",
+          "端口图标候选增加黑名单过滤（排除 gas_/liquid_ 前缀的非流体机器）",
+          "接入 vite-plugin-version-mark 版本维护，新增版本更新说明弹窗",
+        ],
+      },
+    ],
+  },
 };
