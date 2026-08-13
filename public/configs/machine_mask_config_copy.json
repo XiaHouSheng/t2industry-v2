@@ -78,6 +78,40 @@
           "bi.down"
         ],
         [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
+      ],
+      "liquid": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
           "pi.right.pi1",
           "ma",
           "ma",
@@ -104,7 +138,8 @@
       ]
     },
     "port_recipe_icon": {
-      "default": {
+      "default": {},
+      "liquid": {
         "pi1": null
       }
     }
@@ -456,7 +491,7 @@
   },
   "phase_trans_2": {
     "mask": {
-      "default": [
+      "gas": [
         [
           "ma",
           "bi.down",
@@ -465,7 +500,7 @@
           "ma"
         ],
         [
-          "pi.right.pi2",
+          "ma",
           "ma",
           "ma",
           "ma",
@@ -479,11 +514,48 @@
           "ma"
         ],
         [
-          "pi.right.pi3",
+          "ma",
           "ma",
           "ma",
           "ma",
           "po.right.po2"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ]
+      ],
+      "solid": [
+        [
+          "ma",
+          "ma",
+          "pi.down.pi1",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi2",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi3",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
         ],
         [
           "ma",
@@ -495,12 +567,15 @@
       ]
     },
     "port_recipe_icon": {
-      "default": {
+      "gas": {
+        "pi1": null,
+        "po1": null,
+        "po2": null
+      },
+      "solid": {
         "pi1": null,
         "pi2": null,
-        "po1": null,
-        "pi3": null,
-        "po2": null
+        "pi3": null
       }
     }
   },
@@ -542,10 +617,50 @@
           "bo.down",
           "bo.down"
         ]
+      ],
+      "liquid": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "ma",
+          "ma",
+          "ma",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
       ]
     },
     "port_recipe_icon": {
-      "default": {}
+      "default": {},
+      "liquid": {
+        "pi1": null
+      }
     }
   },
   "power_sta_1": {
@@ -627,10 +742,30 @@
           "bo.down",
           "bo.down"
         ]
+      ],
+      "gas": [
+        [
+          "bi.down",
+          "bi.down",
+          "bi.down"
+        ],
+        [
+          "pi.right.pi1",
+          "ma",
+          "ma"
+        ],
+        [
+          "bo.down",
+          "bo.down",
+          "bo.down"
+        ]
       ]
     },
     "port_recipe_icon": {
-      "default": {}
+      "default": {},
+      "gas": {
+        "pi1": null
+      }
     }
   },
   "thickener_1": {

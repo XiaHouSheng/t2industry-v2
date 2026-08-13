@@ -1179,7 +1179,7 @@
         [
           "ma",
           "ma",
-          "po.right"
+          "po.right.po1"
         ],
         [
           "ma",
@@ -1189,7 +1189,9 @@
       ]
     },
     "port_recipe_icon": {
-      "default": {}
+      "default": {
+        "po1": null
+      }
     }
   },
   "concealed_pipe_in_muti_1": {

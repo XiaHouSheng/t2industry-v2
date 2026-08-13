@@ -60,16 +60,24 @@ function itemName(id) {
 
 /* ---------- 输出端口图标 ---------- */
 
-// 端口配置面板预留的机型（暗管出入口）
-const RESERVED_TYPES = [
-  "concealed_pipe_in_1",
-  "concealed_pipe_out",
-  "concealed_pipe_in_muti_1",
-  "concealed_pipe_out_muti_1",
-];
+// 端口配置面板预留的机型（暗管入口）
+const RESERVED_TYPES = ["concealed_pipe_in_1", "concealed_pipe_in_muti_1"];
 
 // 候选图标为全部物品的机型（协议核心 / 仓库取货口）
 const ALL_ITEM_TYPES = ["protocol_core_1", "warehouse_output_1"];
+
+// 候选图标为全部液体的机型（暗管出口）
+const ALL_FLUID_TYPES = ["concealed_pipe_out", "concealed_pipe_out_muti_1"];
+
+// 暗管出口端口图标黑名单：gas_/liquid_ 前缀但实为机器的物品
+const FLUID_PORT_ICON_BLACKLIST = [
+  "gas_pump_1", // 气体收集泵
+  "gas_reactor_1", // 气体反应炉
+  "liquid_clean_gate", // 净水节点(污水接入口)
+  "liquid_cleaner_1", // 废水处理机
+  "liquid_purifier_1", // 提纯机
+  "liquid_recycle_gate", // 净水节点(产物排出口)
+];
 
 // pi 输入端口固定附加项：气态息壤（用于激活机器）
 const PI_FIXED_ITEM = "gas_xiranite";
@@ -124,7 +132,7 @@ function isFluid(id) {
   return id.startsWith("gas_") || id.startsWith("liquid_");
 }
 
-/** 某端口的候选图标：特殊机型取非流体、非机器、非黑名单（传送带传输）；pi(输入)取流体输入+气态息壤；其余取流体输出 */
+/** 某端口的候选图标：特殊机型取非流体、非机器、非黑名单（传送带传输）；暗管出口取全部液体；pi(输入)取流体输入+气态息壤；其余取流体输出 */
 function portCandidatesFor(key) {
   if (ALL_ITEM_TYPES.includes(props.machine.type)) {
     // 传送带传输，流体、机器与黑名单物品不可选
@@ -133,6 +141,12 @@ function portCandidatesFor(key) {
         !isFluid(id) &&
         resourcesStore.items[id]?.category !== "machine" &&
         !PORT_ICON_BLACKLIST.includes(id),
+    );
+  }
+  if (ALL_FLUID_TYPES.includes(props.machine.type)) {
+    // 暗管出口：端口图标可选全部液体（排除 gas_/liquid_ 前缀但实为机器的物品）
+    return Object.keys(resourcesStore.items).filter(
+      (id) => isFluid(id) && !FLUID_PORT_ICON_BLACKLIST.includes(id),
     );
   }
   const recipe = currentRecipe.value;

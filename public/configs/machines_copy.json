@@ -53,9 +53,10 @@
   "filling_pd_mc_1": {
     "id": "filling_pd_mc_1",
     "name": "灌装机",
-    "now_mode": "default",
+    "now_mode": "liquid",
     "modes": [
-      "default"
+      "default",
+      "liquid"
     ],
     "gridWidth": 6,
     "gridHeight": 4,
@@ -346,9 +347,10 @@
   "phase_trans_2": {
     "id": "phase_trans_2",
     "name": "固气转化机",
-    "now_mode": "default",
+    "now_mode": "solid",
     "modes": [
-      "default"
+      "gas",
+      "solid"
     ],
     "gridWidth": 5,
     "gridHeight": 5,
@@ -379,9 +381,10 @@
   "planter_1": {
     "id": "planter_1",
     "name": "种植机",
-    "now_mode": "default",
+    "now_mode": "liquid",
     "modes": [
-      "default"
+      "default",
+      "liquid"
     ],
     "gridWidth": 5,
     "gridHeight": 5,
@@ -466,9 +469,10 @@
   "shaper_1": {
     "id": "shaper_1",
     "name": "塑形机",
-    "now_mode": "default",
+    "now_mode": "gas",
     "modes": [
-      "default"
+      "default",
+      "gas"
     ],
     "gridWidth": 3,
     "gridHeight": 3,
