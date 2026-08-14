@@ -895,11 +895,11 @@
     "mask": {
       "default": [
         [
-          "ma",
           "bi.down",
-          "ma",
           "bi.down",
-          "ma"
+          "bi.down",
+          "bi.down",
+          "bi.down"
         ],
         [
           "ma",
@@ -923,11 +923,11 @@
           "ma"
         ],
         [
-          "ma",
           "bo.down",
-          "ma",
           "bo.down",
-          "ma"
+          "bo.down",
+          "bo.down",
+          "bo.down"
         ]
       ]
     },
