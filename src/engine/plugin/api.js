@@ -129,6 +129,7 @@ export {
   selectBlueprintLocal,
   addBlueprintLocal,
   changeBlueprintNameLocal,
+  changeBlueprintVersionLocal,
   loadBlueprintFromFile,
   exportBlueprintToFile,
   importBlueprintFromData,
@@ -137,6 +138,7 @@ export {
 export {
   renderBlueprint,
   clearBlueprint,
+  rebuildBlueprint
 } from "../core_blueprint/BlueprintStage.js";
 
 // 资源加载（应用挂载前调用）

@@ -96,6 +96,15 @@ export default {
     close: "Got it",
     logs: [
       {
+        version: "0.1.1",
+        date: "2026-08-13",
+        notes: [
+          "Blueprints now carry a version field to mark their config version",
+          "Added blueprint rebuild: when opening an old-version blueprint, it is automatically rebuilt against the latest machine config after rendering (preserving position/rotation/mode/recipe state)",
+          "Fixed port icons being lost or crashing during rebuild when port_recipe_icon was empty/missing (safe fallback; new config defaults kept for unset ports)",
+        ],
+      },
+      {
         version: "0.1.0",
         date: "2026-08-13",
         notes: [

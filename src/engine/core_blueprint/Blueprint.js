@@ -12,10 +12,11 @@ function setBlueprintCallbacks(
   callbackOnSelectBlueprint = onSelectBlueprint;
 }
 
-function createBlueprint(name, id, content) {
+function createBlueprint(name, id, content, version = null) {
   return {
     name,
     id: id || nanoid(),
+    version,
     content: content || {
       machines: {},
       belts: {},
@@ -187,12 +188,19 @@ function changeBlueprintNameLocal(id, name) {
   storageStore.blueprints[id].name = name;
 }
 
+function changeBlueprintVersionLocal(id, version) {
+  const storageStore = useStorageStore();
+  if (!id || !storageStore.blueprints[id]) return;
+  storageStore.blueprints[id].version = version;
+}
+
 export {
   createBlueprint,
   deleteBlueprintLocal,
   selectBlueprintLocal,
   clearBlueprintLocal,
   changeBlueprintNameLocal,
+  changeBlueprintVersionLocal,
   addBlueprintLocal,
   saveBlueprintLocal,
   loadBlueprintFromFile,
