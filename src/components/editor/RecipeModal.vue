@@ -155,7 +155,10 @@ function portCandidatesFor(key) {
     const ids = Object.keys(recipe.in || {}).filter(isFluid);
     return ids.includes(PI_FIXED_ITEM) ? ids : [PI_FIXED_ITEM, ...ids];
   }
-  return Object.keys(recipe.out || {}).filter(isFluid);
+  // po 输出端口：配方输出 + 配方输入（机器支持特殊串联，输入可直通输出）
+  const outs = Object.keys(recipe.out || {}).filter(isFluid);
+  const ins = Object.keys(recipe.in || {}).filter(isFluid);
+  return Array.from(new Set([...outs, ...ins]));
 }
 
 /** 活动端口的候选图标 */
