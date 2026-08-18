@@ -299,25 +299,25 @@
           "bi.down"
         ],
         [
+          "pi.right.pi1",
           "ma",
           "ma",
           "ma",
-          "ma",
-          "pi.left.pi1"
+          "po.right.po1"
         ],
         [
-          "po.left.po1",
+          "ma",
           "ma",
           "ma",
           "ma",
           "ma"
         ],
         [
+          "pi.right.pi2",
           "ma",
           "ma",
           "ma",
-          "ma",
-          "pi.left.pi2"
+          "po.right.po2"
         ],
         [
           "ma",
@@ -332,7 +332,8 @@
       "default": {
         "pi1": null,
         "po1": null,
-        "pi2": null
+        "pi2": null,
+        "po2": null
       }
     }
   },
@@ -340,11 +341,11 @@
     "mask": {
       "default": [
         [
+          "ma",
           "bi.down",
+          "ma",
           "bi.down",
-          "bi.down",
-          "bi.down",
-          "bi.down"
+          "ma"
         ],
         [
           "pi.right.pi1",
@@ -368,11 +369,11 @@
           "po.right.po2"
         ],
         [
+          "ma",
           "bo.down",
+          "ma",
           "bo.down",
-          "bo.down",
-          "bo.down",
-          "bo.down"
+          "ma"
         ]
       ]
     },
