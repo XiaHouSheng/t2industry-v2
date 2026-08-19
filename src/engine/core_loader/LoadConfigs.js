@@ -29,12 +29,19 @@ function applyBitmapTextureConfig(texture) {
 }
 
 const CONFIG_PATHS = {
-  machines: `${BASE}configs/machines.json`,
-  machine_config: `${BASE}configs/machines.json`,
-  machine_mask_config: `${BASE}configs/machine_mask_config.json`,
-  data: `${BASE}configs/data.json`,
+  //machines: `${BASE}configs/machines.json`,
+  //machine_config: `${BASE}configs/machines.json`,
+  //machine_mask_config: `${BASE}configs/machine_mask_config.json`,
+  //data: `${BASE}configs/data.json`,
   iconsheet: `${BASE}resources/icons.webp`,
 };
+
+const CONFIG_PATHS_CDN = {
+  machines: `https://cdn.t2blueprint.xyz/config/machines.json`,
+  machine_config: `https://cdn.t2blueprint.xyz/config/machines.json`,
+  machine_mask_config: `https://cdn.t2blueprint.xyz/config/machine_mask_config.json`,
+  data: `https://cdn.t2blueprint.xyz/config/data.json`,
+}
 
 // public/textures/ 下所有 PNG 文件名（不含扩展名作 key）
 const TEXTURE_FILES = [
@@ -154,7 +161,7 @@ const MACHINE_ICON_FILES = [
 ];
 
 async function fetchJSON(url) {
-  const res = await fetch(url, { cache: "reload" });
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
   return res.json();
 }
@@ -165,7 +172,7 @@ async function fetchJSON(url) {
 export async function loadDataConfigs() {
   try {
     const resStore = useResourcesStore();
-    const data = await fetchJSON(CONFIG_PATHS.data);
+    const data = await fetchJSON(CONFIG_PATHS_CDN.data);
 
     resStore.setIcons(data.icons || []);
     resStore.setCategories(data.categories || []);
@@ -179,7 +186,7 @@ export async function loadDataConfigs() {
 
     // 加载 machines.json 并注入 anchor / 完整机器定义
     try {
-      const machinesConfig = await fetchJSON(CONFIG_PATHS.machine_config);
+      const machinesConfig = await fetchJSON(CONFIG_PATHS_CDN.machine_config);
       // 注入 anchor → ResourcesStore.machines
       resStore.injectMachineAnchorMask(machinesConfig);
       // 注入完整机器定义 → MachineStore.machineTypes
@@ -192,7 +199,7 @@ export async function loadDataConfigs() {
 
     // 加载 machine_mask_config.json → ResourcesStore.machine_masks
     try {
-      const maskConfig = await fetchJSON(CONFIG_PATHS.machine_mask_config);
+      const maskConfig = await fetchJSON(CONFIG_PATHS_CDN.machine_mask_config);
       resStore.setMachineMasks(maskConfig);
       console.log("[Loader] machine_mask_config injected");
     } catch (err) {
