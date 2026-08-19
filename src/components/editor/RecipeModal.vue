@@ -69,6 +69,9 @@ const ALL_ITEM_TYPES = ["protocol_core_1", "warehouse_output_1"];
 // 候选图标为全部液体的机型（暗管出口）
 const ALL_FLUID_TYPES = ["concealed_pipe_out", "concealed_pipe_out_muti_1"];
 
+// 候选图标为全部气体的机型 (气体散布机)
+const ALL_GAS_TYPES = ["gas_disperser_1"];
+
 // 暗管出口端口图标黑名单：gas_/liquid_ 前缀但实为机器的物品
 const FLUID_PORT_ICON_BLACKLIST = [
   "gas_pump_1", // 气体收集泵
@@ -132,6 +135,11 @@ function isFluid(id) {
   return id.startsWith("gas_") || id.startsWith("liquid_");
 }
 
+/** 是否为气体（gas_ 前缀） */
+function isGas(id) {
+  return id.startsWith("gas_");
+}
+
 /** 某端口的候选图标：特殊机型取非流体、非机器、非黑名单（传送带传输）；暗管出口取全部液体；pi(输入)取流体输入+气态息壤；其余取流体输出 */
 function portCandidatesFor(key) {
   if (ALL_ITEM_TYPES.includes(props.machine.type)) {
@@ -149,6 +157,14 @@ function portCandidatesFor(key) {
       (id) => isFluid(id) && !FLUID_PORT_ICON_BLACKLIST.includes(id),
     );
   }
+
+  if (ALL_GAS_TYPES.includes(props.machine.type)) {
+    // 气体散布机：端口图标可选全部气体
+    return Object.keys(resourcesStore.items).filter(
+      (id) => isGas(id) && !FLUID_PORT_ICON_BLACKLIST.includes(id),
+    );
+  }
+
   const recipe = currentRecipe.value;
   if (!recipe) return [];
   if (portType(key) === "pi") {

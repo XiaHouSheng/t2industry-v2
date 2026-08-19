@@ -28,7 +28,8 @@ export default {
     renameBlueprint: "Rename blueprint",
     renameBlueprintPrompt: "Rename blueprint 「{name}」",
     deleteConfirm: "Delete blueprint 「{name}」?",
-    deleteLastConfirm: "This is the last blueprint and cannot be deleted; its content will be cleared. Continue?",
+    deleteLastConfirm:
+      "This is the last blueprint and cannot be deleted; its content will be cleared. Continue?",
     tools: "Tools",
     save: "Save",
     clear: "Clear",
@@ -76,7 +77,8 @@ export default {
     currentRecipe: "Current Recipe",
     noRecipe: "No recipe",
     outputPortIcon: "Output Port Icons",
-    reservedHint: "Port configuration is not available for this machine yet (reserved)",
+    reservedHint:
+      "Port configuration is not available for this machine yet (reserved)",
     portTitle: "Click to choose icon for {key}",
     notSet: "Not set",
     edit: "Edit",
@@ -95,6 +97,15 @@ export default {
     noLogs: "No release notes yet",
     close: "Got it",
     logs: [
+      {
+        version: "0.1.2",
+        date: "2026-08-20",
+        notes: [
+          "Replaced and deployed CDN configuration file",
+          "Developed gas‑input parameter configuration for gas disperser",
+          "Implemented persistent indicator range feature for gas disperser",
+        ],
+      },
       {
         version: "0.1.1",
         date: "2026-08-13",

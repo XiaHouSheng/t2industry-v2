@@ -42,6 +42,7 @@ export const useMachineStore = defineStore("machineStore", () => {
     "warehouse_output_1": PortItemContainer,
     "concealed_pipe_out": PortItemContainer,
     "concealed_pipe_out_muti_1": PortItemContainer,
+    "gas_disperser_1": PortItemContainer,
   });
 
   /**
