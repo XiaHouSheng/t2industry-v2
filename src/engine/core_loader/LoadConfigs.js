@@ -2,7 +2,20 @@ import { Assets } from "pixi.js";
 import { useMachineStore } from "../stores/MachineStore.js";
 import { useResourcesStore } from "../stores/ResourcesStore.js";
 
-const BASE = import.meta.env.BASE_URL; // 适配 Vite base 路径
+// 适配 Vite base 路径 | 本地开发时使用 /，CDN 时使用 https://cdn.t2blueprint.xyz/
+const BASE = import.meta.env.BASE_URL;
+
+/** 开发模式（pnpm run dev）为 true；vite build 构建后为 false */
+const IS_DEV = import.meta.env.DEV;
+
+/**
+ * 图片资源根目录（machine_icons / resources / textures 均在其下）：
+ * - 开发：本地 public/ 下（BASE 去尾斜杠）
+ * - 构建：CDN https://cdn.t2blueprint.xyz/image
+ */
+export const IMAGE_BASE = IS_DEV
+  ? BASE.replace(/\/+$/, "")
+  : "https://cdn.t2blueprint.xyz/image";
 
 /**
  * 为独立 PNG 纹理统一设置采样策略（PixiJS v8）：
@@ -29,19 +42,23 @@ function applyBitmapTextureConfig(texture) {
 }
 
 const CONFIG_PATHS = {
-  //machines: `${BASE}configs/machines.json`,
-  //machine_config: `${BASE}configs/machines.json`,
-  //machine_mask_config: `${BASE}configs/machine_mask_config.json`,
-  //data: `${BASE}configs/data.json`,
-  iconsheet: `${BASE}resources/icons.webp`,
+  iconsheet: `${IMAGE_BASE}/resources/icons.webp`,
 };
 
-const CONFIG_PATHS_CDN = {
-  machines: `https://cdn.t2blueprint.xyz/config/machines.json`,
-  machine_config: `https://cdn.t2blueprint.xyz/config/machines.json`,
-  machine_mask_config: `https://cdn.t2blueprint.xyz/config/machine_mask_config.json`,
-  data: `https://cdn.t2blueprint.xyz/config/data.json`,
-}
+// 配置数据：开发用本地 public/configs/，构建后走 CDN
+const CONFIG_PATHS_CDN = IS_DEV
+  ? {
+      machines: `${BASE}configs/machines.json`,
+      machine_config: `${BASE}configs/machines.json`,
+      machine_mask_config: `${BASE}configs/machine_mask_config.json`,
+      data: `${BASE}configs/data.json`,
+    }
+  : {
+      machines: `https://cdn.t2blueprint.xyz/config/machines.json`,
+      machine_config: `https://cdn.t2blueprint.xyz/config/machines.json`,
+      machine_mask_config: `https://cdn.t2blueprint.xyz/config/machine_mask_config.json`,
+      data: `https://cdn.t2blueprint.xyz/config/data.json`,
+    };
 
 // public/textures/ 下所有 PNG 文件名（不含扩展名作 key）
 const TEXTURE_FILES = [
@@ -109,7 +126,8 @@ const TEXTURE_FILES = [
   "port_out_5",
   "port_out_5_2",
   "port_out_5_3",
-  "port_out_6", "port_out_6_4",
+  "port_out_6",
+  "port_out_6_4",
   "belt_port_in_1",
   "belt_port_out_1",
   "machine_bg_big_icon",
@@ -191,7 +209,10 @@ export async function loadDataConfigs() {
       resStore.injectMachineAnchorMask(machinesConfig);
       // 注入完整机器定义 → MachineStore.machineTypes
       const machineStore = useMachineStore();
-      machineStore.injectFromConfig(machinesConfig, resStore.black_list_machine);
+      machineStore.injectFromConfig(
+        machinesConfig,
+        resStore.black_list_machine,
+      );
       console.log("[Loader] machines config injected");
     } catch (err) {
       console.warn("[Loader] machines not found:", err.message);
@@ -226,7 +247,12 @@ export async function loadIconSheet() {
     const texture = await Assets.load(url);
     const resStore = useResourcesStore();
     resStore.iconsheetTexture = texture;
-    console.log("[Loader] iconsheet loaded, size:", texture.width, "x", texture.height);
+    console.log(
+      "[Loader] iconsheet loaded, size:",
+      texture.width,
+      "x",
+      texture.height,
+    );
     return true;
   } catch (err) {
     console.warn("[Loader] iconsheet not found:", err.message);
@@ -242,7 +268,7 @@ export async function loadTextures() {
     const resStore = useResourcesStore();
     const entries = await Promise.all(
       TEXTURE_FILES.map((name) =>
-        Assets.load(`${BASE}textures/${name}.png`).then((tex) => [
+        Assets.load(`${IMAGE_BASE}/textures/${name}.png`).then((tex) => [
           name,
           applyBitmapTextureConfig(tex),
         ]),
@@ -267,7 +293,7 @@ export async function loadMachineIcons() {
     const resStore = useResourcesStore();
     const entries = await Promise.all(
       MACHINE_ICON_FILES.map((name) =>
-        Assets.load(`${BASE}machine_icons/${name}.png`).then((tex) => [
+        Assets.load(`${IMAGE_BASE}/machine_icons/${name}.png`).then((tex) => [
           name,
           applyBitmapTextureConfig(tex),
         ]),
@@ -423,32 +449,36 @@ export function buildSpriteSheets() {
   if (beltPortIn && beltPortOut && pipeIn && pipeOut) {
     const beltPort = {};
     // belt 输出端口，默认朝下
-    beltPort["in.down"]  = make(beltPortIn, 0);
-    beltPort["in.left"]  = make(beltPortIn,  Math.PI / 2);
-    beltPort["in.up"]    = make(beltPortIn,  Math.PI);
+    beltPort["in.down"] = make(beltPortIn, 0);
+    beltPort["in.left"] = make(beltPortIn, Math.PI / 2);
+    beltPort["in.up"] = make(beltPortIn, Math.PI);
     beltPort["in.right"] = make(beltPortIn, -Math.PI / 2);
     // belt 输入端口，默认朝上
-    beltPort["out.up"]    = make(beltPortOut, 0);
-    beltPort["out.right"] = make(beltPortOut,  Math.PI / 2);
-    beltPort["out.down"]  = make(beltPortOut,  Math.PI);
-    beltPort["out.left"]  = make(beltPortOut, -Math.PI / 2);
+    beltPort["out.up"] = make(beltPortOut, 0);
+    beltPort["out.right"] = make(beltPortOut, Math.PI / 2);
+    beltPort["out.down"] = make(beltPortOut, Math.PI);
+    beltPort["out.left"] = make(beltPortOut, -Math.PI / 2);
 
     const pipePort = {};
     // pipe 输入端口，默认朝下
-    pipePort["in.down"]  = make(pipeIn, 0);
-    pipePort["in.left"]  = make(pipeIn,  Math.PI / 2);
-    pipePort["in.up"]    = make(pipeIn,  Math.PI);
+    pipePort["in.down"] = make(pipeIn, 0);
+    pipePort["in.left"] = make(pipeIn, Math.PI / 2);
+    pipePort["in.up"] = make(pipeIn, Math.PI);
     pipePort["in.right"] = make(pipeIn, -Math.PI / 2);
     // pipe 输出端口，默认朝上
-    pipePort["out.up"]    = make(pipeOut, 0);
-    pipePort["out.right"] = make(pipeOut,  Math.PI / 2);
-    pipePort["out.down"]  = make(pipeOut,  Math.PI);
-    pipePort["out.left"]  = make(pipeOut, -Math.PI / 2);
+    pipePort["out.up"] = make(pipeOut, 0);
+    pipePort["out.right"] = make(pipeOut, Math.PI / 2);
+    pipePort["out.down"] = make(pipeOut, Math.PI);
+    pipePort["out.left"] = make(pipeOut, -Math.PI / 2);
 
     resStore.setPortSheets({ belt: beltPort, pipe: pipePort });
-    console.log(`[Loader] port sheets built (belt:${Object.keys(beltPort).length}, pipe:${Object.keys(pipePort).length})`);
+    console.log(
+      `[Loader] port sheets built (belt:${Object.keys(beltPort).length}, pipe:${Object.keys(pipePort).length})`,
+    );
   } else {
-    console.warn("[Loader] belt/pipe port textures missing, skip port sheet build");
+    console.warn(
+      "[Loader] belt/pipe port textures missing, skip port sheet build",
+    );
   }
 
   resStore.setSpriteSheets({ belt, pipe });

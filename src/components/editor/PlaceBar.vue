@@ -13,12 +13,11 @@ import { useI18n } from "vue-i18n";
 import {
   useMachineStore,
   useResourcesStore,
+  IMAGE_BASE,
   dispatchPlaceMachineHandle,
   dispatchPlaceNodeHandle,
 } from "@/engine/plugin/api.js";
 import { useEditorStore, TOOL_MACHINE, TOOL_NODE } from "@/stores/EditorStore.js";
-
-const BASE = import.meta.env.BASE_URL;
 
 const { t, te } = useI18n();
 const editorStore = useEditorStore();
@@ -55,7 +54,7 @@ const categories = computed(() => Object.keys(machineGroups.value));
 
 function iconSrc(id) {
   return resourcesStore.machineIcons[id]
-    ? `${BASE}machine_icons/${id}.png`
+    ? `${IMAGE_BASE}/machine_icons/${id}.png`
     : "";
 }
 
@@ -75,7 +74,7 @@ const PIPE_NODE_TYPES = [
 ];
 
 function nodeIconSrc(name) {
-  return `${BASE}textures/${name}.png`;
+  return `${IMAGE_BASE}/textures/${name}.png`;
 }
 
 /** 节点类型显示名（i18n） */

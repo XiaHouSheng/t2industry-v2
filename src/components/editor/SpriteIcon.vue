@@ -7,9 +7,7 @@
  * 再通过 transform: scale 缩放到目标尺寸，不依赖 PIXI 渲染。
  */
 import { computed } from "vue";
-import { useResourcesStore } from "@/engine/plugin/api.js";
-
-const BASE = import.meta.env.BASE_URL;
+import { useResourcesStore, IMAGE_BASE } from "@/engine/plugin/api.js";
 
 const props = defineProps({
   itemId: { type: String, required: true },
@@ -18,7 +16,7 @@ const props = defineProps({
 
 const resourcesStore = useResourcesStore();
 
-const iconsUrl = `${BASE}resources/icons.webp`;
+const iconsUrl = `${IMAGE_BASE}/resources/icons.webp`;
 const icon = computed(() => resourcesStore.icons[props.itemId] || null);
 const scale = computed(() => props.size / 64);
 

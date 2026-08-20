@@ -144,6 +144,9 @@ export {
 // 资源加载（应用挂载前调用）
 export { initLoader } from "../core_loader/index.js";
 
+// 图片资源 CDN 根目录（machine_icons / resources / textures）
+export { IMAGE_BASE } from "../core_loader/LoadConfigs.js";
+
 // 舞台初始化（画布宿主组件使用）
 export { app } from "../core_stage/SimStage.js";
 export { drawGridLines, drawHitArea } from "../core_stage/SimInit.js";

@@ -20,10 +20,9 @@ import {
   getNowMode,
   switchMachineMode,
   getMachineObject,
+  IMAGE_BASE,
 } from "@/engine/plugin/api.js";
 import SpriteIcon from "./SpriteIcon.vue";
-
-const BASE = import.meta.env.BASE_URL;
 
 const props = defineProps({
   machine: { type: Object, required: true },
@@ -51,7 +50,9 @@ const recipes = computed(() =>
 
 const machineIcon = computed(
   () =>
-    (props.machine.type ? `${BASE}machine_icons/${props.machine.type}.png` : ""),
+    (props.machine.type
+      ? `${IMAGE_BASE}/machine_icons/${props.machine.type}.png`
+      : ""),
 );
 
 function itemName(id) {

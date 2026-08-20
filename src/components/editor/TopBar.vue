@@ -134,7 +134,7 @@ function toggleLang() {
     <div class="brand">
       <img
         class="brand-mark"
-        src="/resources/logo_256px_transparent.png"
+        :src="`https://cdn.t2blueprint.xyz/image/resources/logo_256px_transparent.png`"
         alt="T2·工业"
       />
       <span class="brand-name">{{ t("topbar.brand") }}</span>
