@@ -20,6 +20,9 @@ importers:
       pixi.js:
         specifier: ^8.19.0
         version: 8.19.0
+      t2industry-sim-engine:
+        specifier: ^1.0.0
+        version: 1.0.0
       vite-plugin-version-mark:
         specifier: ^0.2.2
         version: 0.2.2(@nuxt/kit@4.5.2(magic-string@0.30.21)(rolldown@1.2.3))(@nuxt/schema@4.5.2)(vite@8.2.1(jiti@2.7.0))
@@ -522,6 +525,9 @@ packages:
 
   std-env@4.2.0:
     resolution: {integrity: sha512-oCUKSupKTHX53EyjDtuZQ64pjLJ6yYCtpmEw0goYxtjG9KpbRe8KAsl2tBUGU9DyMcJ0RwJ8GqJAFzMXcXW1Rw==}
+
+  t2industry-sim-engine@1.0.0:
+    resolution: {integrity: sha512-2XSRAcTwRiA1sQYP+d7elD0n4tRKTAFKrxN5+Z3NLZ1kQshG9GMyVpFhurPgq2l1AdbMVndasfPpmAynLSKLBg==}
 
   tiny-lru@11.4.7:
     resolution: {integrity: sha512-w/Te7uMUVeH0CR8vZIjr+XiN41V+30lkDdK+NRIDCUYKKuL9VcmaUEmaPISuwGhLlrTGh5yu18lENtR9axSxYw==}
@@ -1062,6 +1068,8 @@ snapshots:
   source-map-js@1.2.1: {}
 
   std-env@4.2.0: {}
+
+  t2industry-sim-engine@1.0.0: {}
 
   tiny-lru@11.4.7: {}
 
