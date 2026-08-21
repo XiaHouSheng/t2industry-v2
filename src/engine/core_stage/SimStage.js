@@ -4,6 +4,8 @@ const app = new Application();
 const rootStage = app.stage;
 // 视图容器|用于缩放渲染
 const viewportContainer = new Container();
+// 模拟仿真容器
+const simulationContainer = new Container();
 // 指示器容器
 const indicatorContainer = new Container();
 // 机器容器
@@ -22,6 +24,7 @@ viewportContainer.addChild(
     pipeRootContainer,
     machineRootContainer,
     indicatorContainer,
+    simulationContainer,
 )
 
 // 根舞台添加视图容器
@@ -31,6 +34,7 @@ export {
     app,
     rootStage,
     viewportContainer,
+    simulationContainer,
     indicatorContainer,
     machineRootContainer,
     pipeRootContainer,

@@ -104,7 +104,7 @@ export default {
     step: "单步",
     reset: "重置",
     params: "模拟参数",
-    interval: "Tick 间隔",
+    speed: "速度",
     gameSecPerTick: "每 Tick 游戏秒数",
     status: "运行状态",
     tick: "Tick",

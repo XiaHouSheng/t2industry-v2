@@ -10,6 +10,7 @@
 import { ref, computed } from "vue";
 import { createSimulation, loadBlueprint, loadRecipes } from "t2industry-sim-engine";
 import { useStorageStore, useResourcesStore } from "@/engine/plugin/api.js";
+import { initMaskMap, updateMask, clearMaskMap } from "@/simulation/SimRender.js";
 
 /* ------------------------------------------------------------------ */
 /*  响应式状态                                                          */
@@ -27,7 +28,7 @@ const panelCollapsed = ref(false);
 
 const params = ref({
   intervalMs: 100,
-  gameSecPerTick: 0.5,
+  gameSecPerTick: 2,
   reportEveryTicks: 1,
 });
 
@@ -117,15 +118,21 @@ function prepare() {
       onStart(snap) {
         console.log("[SimBridge] onStart tick=", snap.tick);
         running.value = true;
+        window.__T2_CONFIG__.running = true;
+        initMaskMap(snap);
         applySnapshot(snap);
       },
       onUpdate(snap) {
         //console.log("[SimBridge] onUpdate tick=", snap.tick);
+        //console.log(snap);
+        updateMask(snap);
         applySnapshot(snap);
       },
       onStop(snap) {
         console.log("[SimBridge] onStop tick=", snap.tick);
         running.value = false;
+        window.__T2_CONFIG__.running = false;
+        clearMaskMap();
         applySnapshot(snap);
       },
     });

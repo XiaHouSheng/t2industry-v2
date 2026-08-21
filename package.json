@@ -13,7 +13,7 @@
     "pinia": "^4.0.2",
     "pinia-plugin-persistedstate": "^4.7.1",
     "pixi.js": "^8.19.0",
-    "t2industry-sim-engine": "^1.0.0",
+    "t2industry-sim-engine": "1.0.2-b4",
     "vite-plugin-version-mark": "^0.2.2",
     "vue": "^3.5.40",
     "vue-i18n": "^11.4.8"

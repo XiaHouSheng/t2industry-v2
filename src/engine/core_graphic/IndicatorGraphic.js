@@ -19,24 +19,29 @@ class IndicatorGraphic extends Container {
     this.resourcesStore = useResourcesStore();
     this.cellHeight = cellSize.height;
     this.cellWidth = cellSize.width;
+    this.gridWidth = gridWidth;
+    this.gridHeight = gridHeight;
     this.gridX = gridX;
     this.gridY = gridY;
     this.pivot.x = pivot.x * this.cellWidth * gridWidth;
     this.pivot.y = pivot.y * this.cellHeight * gridHeight;
     this.x = gridX * this.cellWidth - this.cellWidth * 0.5;
     this.y = gridY * this.cellHeight - this.cellHeight * 0.5;
+    this.is_conflict = is_conflict;
 
-    // Graphics 作为子对象绘制矩形背景
-    const bg = new Graphics();
-    bg.rect(0, 0, gridWidth * this.cellWidth, gridHeight * this.cellHeight);
-    if (!is_conflict) bg.fill({ color: 0x0000ff, alpha: 0.5 });
-    else bg.fill({ color: 0xff0000, alpha: 0.5 });
-    this.addChild(bg);
-
+    this.renderMaskGraphic();
     this.#drawBeltPipePortIndicator(pipe_or_belt_entity);
     this.#drawMachinePortIndicator(machine_entity, cellSize);
     this.#drawPowerPileArea(machine_entity);
     this.#drawGasDisperserArea(machine_entity);
+  }
+
+  renderMaskGraphic() {
+    this.background = new Graphics()
+    this.background.rect(0, 0, this.gridWidth * this.cellWidth, this.gridHeight * this.cellHeight);
+    if (!this.is_conflict) this.background.fill({ color: 0x0000ff, alpha: 0.5 });
+    else this.background.fill({ color: 0xff0000, alpha: 0.5 });
+    this.addChild(this.background);
   }
 
   moveToGrid(position) {

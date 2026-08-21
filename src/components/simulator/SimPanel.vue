@@ -70,6 +70,15 @@ const consumedList = computed(() => {
     .slice(0, 8);
 });
 
+/**
+ * 速率挡位：与状态区“速率”统计口径一致，
+ * 挡位数值 = Math.round(1000 / intervalMs)（ticks/s）
+ */
+const SPEED_GEARS = [200, 100, 50, 25, 20];
+
+/** 由 intervalMs 换算实际速率（ticks/s），与速率统计同公式 */
+const gearRate = (intervalMs) => Math.round(1000 / intervalMs);
+
 /** 传输状态摘要 */
 const transportSummary = computed(() => {
   const snap = snapshot.value;
@@ -87,11 +96,6 @@ const transportSummary = computed(() => {
 });
 
 /* ---------- 参数输入处理 ---------- */
-
-function onIntervalChange(e) {
-  const val = Number.parseInt(e.target.value, 10);
-  if (!Number.isNaN(val)) setParams({ intervalMs: val });
-}
 
 function onGameSecChange(e) {
   const val = Number.parseFloat(e.target.value);
@@ -159,20 +163,23 @@ function onGameSecChange(e) {
         <h4 class="sim-section-title">{{ t("simPanel.params") }}</h4>
         <div class="sim-param-row">
           <label class="sim-param-label">
-            {{ t("simPanel.interval") }}
+            {{ t("simPanel.speed") }}
             <span class="sim-param-value">{{ params.intervalMs }}ms</span>
           </label>
-          <input
-            type="range"
-            min="16"
-            max="1000"
-            step="16"
-            :value="params.intervalMs"
-            @input="onIntervalChange"
-            class="sim-range"
-          />
+          <div class="sim-gears">
+            <button
+              v-for="ms in SPEED_GEARS"
+              :key="ms"
+              class="sim-gear"
+              :class="{ active: params.intervalMs === ms }"
+              :title="`${gearRate(ms)} ticks/s`"
+              @click="setParams({ intervalMs: ms })"
+            >
+              {{ gearRate(ms) }}
+            </button>
+          </div>
         </div>
-        <div class="sim-param-row">
+        <div class="sim-param-row invisible">
           <label class="sim-param-label">
             {{ t("simPanel.gameSecPerTick") }}
             <span class="sim-param-value">{{ params.gameSecPerTick }}s</span>
@@ -271,7 +278,7 @@ function onGameSecChange(e) {
             <div v-if="producedList.length" class="sim-io-list">
               <div v-for="[id, count] in producedList" :key="id" class="sim-io-item">
                 <span class="sim-io-id">{{ id }}</span>
-                <span class="sim-io-count">{{ count }}</span>
+                <span class="sim-io-count">{{ count.toFixed(1) }}</span>
               </div>
             </div>
             <div v-else class="sim-io-empty">{{ t("simPanel.noData") }}</div>
@@ -284,7 +291,7 @@ function onGameSecChange(e) {
             <div v-if="consumedList.length" class="sim-io-list">
               <div v-for="[id, count] in consumedList" :key="id" class="sim-io-item">
                 <span class="sim-io-id">{{ id }}</span>
-                <span class="sim-io-count">{{ count }}</span>
+                <span class="sim-io-count">{{ count.toFixed(1) }}</span>
               </div>
             </div>
             <div v-else class="sim-io-empty">{{ t("simPanel.noData") }}</div>
@@ -498,6 +505,36 @@ function onGameSecChange(e) {
   font-weight: 600;
 }
 
+.sim-gears {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.sim-gear {
+  padding: 4px 0;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  text-align: center;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.sim-gear:hover {
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+.sim-gear.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
 .sim-range {
   -webkit-appearance: none;
   appearance: none;
@@ -666,4 +703,10 @@ function onGameSecChange(e) {
   font-style: italic;
   padding: 4px 0;
 }
+
+.invisible {
+  visibility: hidden;
+  display: none;
+}
+
 </style>

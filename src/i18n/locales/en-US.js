@@ -106,7 +106,7 @@ export default {
     step: "Step",
     reset: "Reset",
     params: "Parameters",
-    interval: "Tick Interval",
+    speed: "Speed",
     gameSecPerTick: "Game Sec / Tick",
     status: "Runtime",
     tick: "Tick",

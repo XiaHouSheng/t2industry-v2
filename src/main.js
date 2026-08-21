@@ -12,6 +12,9 @@ pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 app.use(i18n)
 
+// 全局配置
+window.__T2_CONFIG__ = { running: false };
+
 // 引擎资源加载（机器配置/纹理等）完成后，再挂载 UI
 initLoader().finally(() => {
   app.mount('#app')

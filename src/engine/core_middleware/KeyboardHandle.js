@@ -55,6 +55,10 @@ function handleKeyboardUp(keyboardEvent) {
 }
 
 function handleKeyboard(keyboardEvent) {
+  if (window.__T2_CONFIG__.running) {
+    console.log("[KeyboardHandle] Sim is running, ignore keyboard event");
+    return;
+  }
   if (isTypingTarget(keyboardEvent)) return;
   if (!commandStore) commandStore = useCommandStore();
   commandStore.is_ctrl = keyboardEvent.ctrlKey;
