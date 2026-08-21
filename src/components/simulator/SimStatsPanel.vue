@@ -7,11 +7,25 @@
  */
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { snapshot, panelCollapsed } from "@/simulation/SimBridge.js";
+import { Sparkline } from "sparkline-vue";
+import { snapshot, panelCollapsed, rateHistory } from "@/simulation/SimBridge.js";
 import { useResourcesStore } from "@/engine/plugin/api.js";
 
 const { t } = useI18n();
 const resourcesStore = useResourcesStore();
+
+/** 与主题色一致（style.css: --ok / --danger） */
+const PRODUCED_COLOR = "#7fb069";
+const CONSUMED_COLOR = "#e26d5c";
+
+/** 每行 sparkline 双系列配置：产出(绿) + 消耗(红)，细线 + 淡填充 */
+const rowTrendOptions = {
+  lineColor: [PRODUCED_COLOR, CONSUMED_COLOR],
+  fillColor: [`${PRODUCED_COLOR}1a`, `${CONSUMED_COLOR}1a`],
+  lineWidth: [1, 1],
+  spotRadius: 0,
+  disableTooltips: true,
+};
 
 /** 通过 item id 获取中文名，找不到则回退显示 id */
 function getItemName(id) {
@@ -21,22 +35,31 @@ function getItemName(id) {
 
 /**
  * 合并产出与消耗为同一列表：
- * 收集所有出现过的物品 id，分别取 producedRate / consumedRate，
+ * 收集所有出现过的物品 id，分别取 producedRate / consumedRate 及其历史，
  * 按 (产出+消耗) 总量降序排列。
  */
 const mergedList = computed(() => {
   const produced = snapshot.value?.producedRate || {};
   const consumed = snapshot.value?.consumedRate || {};
-  const allIds = new Set([...Object.keys(produced), ...Object.keys(consumed)]);
+  const allIds = new Set([
+    ...Object.keys(produced),
+    ...Object.keys(consumed),
+    ...Object.keys(rateHistory.value),
+  ]);
 
   return Array.from(allIds)
-    .map((id) => ({
-      id,
-      name: getItemName(id),
-      produced: (produced[id] || 0).toFixed(1),
-      consumed: (consumed[id] || 0).toFixed(1),
-      total: (produced[id] || 0) + (consumed[id] || 0),
-    }))
+    .map((id) => {
+      const hist = rateHistory.value[id] || { produced: [], consumed: [] };
+      return {
+        id,
+        name: getItemName(id),
+        produced: (produced[id] || 0).toFixed(1),
+        consumed: (consumed[id] || 0).toFixed(1),
+        total: (produced[id] || 0) + (consumed[id] || 0),
+        producedHistory: hist.produced,
+        consumedHistory: hist.consumed,
+      };
+    })
     .filter((item) => item.total > 0)
     .sort((a, b) => b.total - a.total);
 });
@@ -51,20 +74,24 @@ const mergedList = computed(() => {
         <span class="stats-unit">{{ t("simStats.perMin") }}</span>
       </header>
 
-      <!-- 列头 -->
-      <div class="stats-colhead">
-        <span class="colhead-name">{{ t("simStats.item") }}</span>
-        <span class="colhead-io produced">{{ t("simStats.produced") }}</span>
-        <span class="colhead-io consumed">{{ t("simStats.consumed") }}</span>
-      </div>
-
       <!-- 合并列表 -->
       <div class="stats-body">
         <div v-if="mergedList.length" class="stats-list">
-          <div v-for="item in mergedList" :key="item.id" class="stats-row">
-            <span class="stats-name" :title="item.id">{{ item.name }}</span>
-            <span class="stats-io produced">{{ item.produced }}</span>
-            <span class="stats-io consumed">{{ item.consumed }}</span>
+          <div v-for="item in mergedList" :key="item.id" class="stats-item">
+            <div class="stats-row">
+              <span class="stats-name" :title="item.id">{{ item.name }}</span>
+              <span class="stats-io produced">{{ item.produced }}</span>
+              <span class="stats-io consumed">{{ item.consumed }}</span>
+            </div>
+            <div class="stats-spark">
+              <Sparkline
+                :data="[item.producedHistory, item.consumedHistory]"
+                type="line"
+                :width="220"
+                :height="20"
+                :options="rowTrendOptions"
+              />
+            </div>
           </div>
         </div>
         <div v-else class="stats-empty">{{ t("simStats.noData") }}</div>
@@ -174,14 +201,25 @@ const mergedList = computed(() => {
   gap: 3px;
 }
 
+.stats-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px;
+  background: var(--bg-2);
+  border-radius: 5px;
+}
+
 .stats-row {
   display: grid;
   grid-template-columns: 1fr 48px 48px;
   gap: 6px;
   align-items: center;
-  padding: 4px 8px;
-  background: var(--bg-2);
-  border-radius: 5px;
+}
+
+.stats-spark {
+  display: flex;
+  justify-content: center;
 }
 
 .stats-name {

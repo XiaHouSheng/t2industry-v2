@@ -23,6 +23,12 @@ const elapsedMs = ref(0);
 const snapshot = ref(null);
 const error = ref(null);
 
+/** 产出/消耗速率历史（供 sparkline 展示）：按物品维度维护滑动窗口，最多保留 RATE_HISTORY_MAX 个点 */
+const RATE_HISTORY_MAX = 30;
+const rateHistory = ref({});
+/** 最近一次已记录的 tick，用于按 tick 去重 */
+let lastHistoryTick = -1;
+
 /** SimPanel 折叠状态，与左侧 SimStatsPanel 联动 */
 const panelCollapsed = ref(false);
 
@@ -86,6 +92,37 @@ function applySnapshot(snap) {
   gameSeconds.value = snap.gameSeconds ?? 0;
   elapsedMs.value = snap.elapsedMs ?? 0;
   snapshot.value = snap;
+  pushRateHistory(snap);
+}
+
+/**
+ * 记录每种物品的产出/消耗速率历史（sparkline 数据源）。
+ * 结构：rateHistory.value[itemId] = { produced: [], consumed: [] }
+ * 每个 tick 只记录一次；到达上限后移除最旧、追加最新（滑动窗口）。
+ */
+function pushRateHistory(snap) {
+  if (snap.tick === lastHistoryTick) return;
+  lastHistoryTick = snap.tick;
+
+  const produced = snap.producedRate || {};
+  const consumed = snap.consumedRate || {};
+  // 并集：当前有速率的物品 + 历史中已存在的物品（保持曲线延续，掉到 0 也有记录）
+  const allIds = new Set([
+    ...Object.keys(produced),
+    ...Object.keys(consumed),
+    ...Object.keys(rateHistory.value),
+  ]);
+
+  for (const id of allIds) {
+    let hist = rateHistory.value[id];
+    if (!hist) hist = rateHistory.value[id] = { produced: [], consumed: [] };
+    hist.produced.push(Number(produced[id]) || 0);
+    hist.consumed.push(Number(consumed[id]) || 0);
+    while (hist.produced.length > RATE_HISTORY_MAX) {
+      hist.produced.shift();
+      hist.consumed.shift();
+    }
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -220,6 +257,8 @@ function reset() {
   elapsedMs.value = 0;
   snapshot.value = null;
   error.value = null;
+  rateHistory.value = {};
+  lastHistoryTick = -1;
 }
 
 /**
@@ -286,6 +325,7 @@ export {
   error,
   params,
   panelCollapsed,
+  rateHistory,
   machineCount,
   beltCount,
   pipeCount,
