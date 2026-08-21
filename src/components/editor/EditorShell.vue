@@ -13,6 +13,8 @@ import TopBar from "./TopBar.vue";
 import PlaceBar from "./PlaceBar.vue";
 import StatusBar from "./StatusBar.vue";
 import RecipeModal from "./RecipeModal.vue";
+import SimPanel from "@/components/simulator/SimPanel.vue";
+import SimStatsPanel from "@/components/simulator/SimStatsPanel.vue";
 import {
   useCommandStore,
   setMachineClickHandler,
@@ -80,6 +82,8 @@ onUnmounted(() => setMachineClickHandler(null));
       <main class="stage-wrap">
         <SimCanvas />
         <PlaceBar />
+        <SimPanel />
+        <SimStatsPanel />
       </main>
     </div>
     <StatusBar />

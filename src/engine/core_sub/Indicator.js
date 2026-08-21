@@ -254,9 +254,9 @@ function onStartPlace() {
 
     resetTempVariables();
     setBaseGrid(event.gridX, event.gridY);
-    console.log(useStorageStore().beltLocations);
-    console.log(useStorageStore().pipeLocations);
-    console.log(useStorageStore().machineLocations);
+    //console.log(useStorageStore().beltLocations);
+    //console.log(useStorageStore().pipeLocations);
+    //console.log(useStorageStore().machineLocations);
   }
 
   const onmousedown = (event) => {

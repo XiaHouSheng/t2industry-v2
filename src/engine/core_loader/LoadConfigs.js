@@ -227,7 +227,7 @@ export async function loadDataConfigs() {
       console.warn("[Loader] machine_mask_config not found:", err.message);
     }
 
-    console.log(resStore.machines);
+    //console.log(resStore.machines);
 
     console.log("[Loader] data config loaded");
     return true;
