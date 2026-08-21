@@ -155,8 +155,10 @@ function prepare() {
       onStart(snap) {
         console.log("[SimBridge] onStart tick=", snap.tick);
         running.value = true;
+        if (!window.__T2_CONFIG__.running) {
+          initMaskMap(snap);
+        }
         window.__T2_CONFIG__.running = true;
-        initMaskMap(snap);
         applySnapshot(snap);
       },
       onUpdate(snap) {
@@ -168,8 +170,6 @@ function prepare() {
       onStop(snap) {
         console.log("[SimBridge] onStop tick=", snap.tick);
         running.value = false;
-        window.__T2_CONFIG__.running = false;
-        clearMaskMap();
         applySnapshot(snap);
       },
     });
@@ -259,6 +259,8 @@ function reset() {
   error.value = null;
   rateHistory.value = {};
   lastHistoryTick = -1;
+  window.__T2_CONFIG__.running = false;
+  clearMaskMap();
 }
 
 /**
