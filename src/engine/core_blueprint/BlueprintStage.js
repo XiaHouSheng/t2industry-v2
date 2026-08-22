@@ -29,10 +29,9 @@ export function renderBlueprint(blueprint) {
   const { machines = {}, belts = {}, pipes = {} } = blueprint.content;
   const currentVersion = getCurrentVersion();
   const needRebuild = !!currentVersion && blueprint.version !== currentVersion;
-  // 浅拷贝实体后再放置：placeXxx 会写入 gridX/gridY/x/y/centerX/centerY 等字段，
-  // 直接传引用会污染蓝图保存的内容
   Object.values(machines).forEach((machine) => {
-    placeMachine({ ...machine }, machine.gridX, machine.gridY);
+    const copy = JSON.parse(JSON.stringify(machine));
+    placeMachine(copy, copy.gridX, copy.gridY);
   });
   Object.values(belts).forEach((belt) => {
     placeBelt({ ...belt }, belt.gridX, belt.gridY, belt.in, belt.out);

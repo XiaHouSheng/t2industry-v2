@@ -48,11 +48,10 @@ const recipes = computed(() =>
   recipeIds.value.map((id) => resourcesStore.recipes[id]).filter(Boolean),
 );
 
-const machineIcon = computed(
-  () =>
-    (props.machine.type
-      ? `${IMAGE_BASE}/machine_icons/${props.machine.type}.png`
-      : ""),
+const machineIcon = computed(() =>
+  props.machine.type
+    ? `${IMAGE_BASE}/machine_icons/${props.machine.type}.png`
+    : "",
 );
 
 function itemName(id) {
@@ -114,10 +113,14 @@ const rightTab = ref("recipes");
 const isReserved = computed(() => RESERVED_TYPES.includes(props.machine.type));
 
 /** 可配置的输出端口列表：以配置中的 port_recipe_icon 键为准（po1/po2/bo1/pi1...） */
-const portKeys = computed(() => Object.keys(props.machine.port_recipe_icon || {}));
+const portKeys = computed(() =>
+  Object.keys(props.machine.port_recipe_icon || {}),
+);
 
 /** 是否有端口图标配置能力 */
-const hasPortConfig = computed(() => !isReserved.value && portKeys.value.length > 0);
+const hasPortConfig = computed(
+  () => !isReserved.value && portKeys.value.length > 0,
+);
 
 /** 端口方向：从 mask 中该端口的 cell 前缀判断（bo/po=输出，pi=输入） */
 function portType(key) {
@@ -189,16 +192,23 @@ function portIcon(key) {
 
 /** 选中活动端口并切到图标面板 */
 function selectPort(key) {
+  //console.log("SELECT_PORT", "Machine_Id:", props.machine.id);
+  //const container = getMachineObject(props.machine.id);
+  //console.log("SELECT_PORT", "Machine_OBJ:", container.machine);
   activePortKey.value = key;
   rightTab.value = "icons";
 }
 
+
+
 function assignPort(key, itemId) {
+  //console.log("ASSIGN_PORT", "Machine_Id:", props.machine.id);
   setPortRecipeIcon(props.machine, key, itemId);
   // 仅重渲染端口层（不强制覆盖，保留手动配置）
   const container = getMachineObject(props.machine.id);
   if (container?.renderRecipePort) container.renderRecipePort(false);
   else container?.refreshRecipeUI?.();
+  //console.log("ASSIGN_PORT", "Machine_OBJ:", container.machine);
 }
 
 /* ---------- 模式切换 ---------- */
@@ -279,21 +289,12 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
       <!-- 左列：信息 + 当前配方 + 端口配置 -->
       <aside class="left">
         <header class="modal-head">
-          <img
-            v-if="machineIcon"
-            :src="machineIcon"
-            class="head-icon"
-            alt=""
-          />
+          <img v-if="machineIcon" :src="machineIcon" class="head-icon" alt="" />
           <div class="head-text">
             <span class="head-title">{{ machine.name || machine.type }}</span>
             <span class="head-sub">{{ t("recipeModal.headSub") }}</span>
           </div>
-          <button
-            class="head-close"
-            :title="t('common.close')"
-            @click="close"
-          >
+          <button class="head-close" :title="t('common.close')" @click="close">
             ×
           </button>
         </header>
@@ -318,7 +319,9 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
         <section class="cur-section">
           <span class="sec-label">{{ t("recipeModal.currentRecipe") }}</span>
           <div class="cur-recipe">
-            <span class="cur-name">{{ currentRecipe?.name || t("recipeModal.noRecipe") }}</span>
+            <span class="cur-name">{{
+              currentRecipe?.name || t("recipeModal.noRecipe")
+            }}</span>
             <div class="io-row">
               <span class="io-tag in">{{ t("common.input") }}</span>
               <div
@@ -347,10 +350,7 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
         </section>
 
         <!-- 输出端口图标配置 -->
-        <section
-          v-if="isReserved || hasPortConfig"
-          class="ports-section"
-        >
+        <section v-if="isReserved || hasPortConfig" class="ports-section">
           <span class="sec-label">{{ t("recipeModal.outputPortIcon") }}</span>
 
           <!-- 预留机型：面板占位 -->
@@ -373,7 +373,9 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
                 :item-id="portIcon(key)"
                 :size="38"
               />
-              <span v-else class="port-empty">{{ t("recipeModal.notSet") }}</span>
+              <span v-else class="port-empty">{{
+                t("recipeModal.notSet")
+              }}</span>
               <span class="port-name">{{ itemName(portIcon(key)) }}</span>
               <span class="port-edit">{{ t("recipeModal.edit") }}</span>
             </div>
@@ -412,7 +414,9 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
           >
             <span class="recipe-name">
               {{ r.name }}
-              <span v-if="r.id === currentId" class="recipe-now">{{ t("common.current") }}</span>
+              <span v-if="r.id === currentId" class="recipe-now">{{
+                t("common.current")
+              }}</span>
             </span>
             <span class="io-row">
               <span
@@ -613,7 +617,10 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
   font-size: 11px;
   text-transform: capitalize;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .mode-tab:hover {
@@ -705,7 +712,9 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
   border: 1px solid var(--border);
   border-radius: 7px;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .port-slot:hover {
@@ -862,7 +871,10 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
   border-radius: 8px;
   color: var(--text-dim);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .icon-cell:hover {
@@ -931,7 +943,10 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
   color: var(--text-dim);
   text-align: left;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .recipe-item:hover {
