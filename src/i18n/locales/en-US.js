@@ -134,6 +134,20 @@ export default {
     close: "Got it",
     logs: [
       {
+        version: "0.1.3",
+        date: "2026-08-22",
+        notes: [
+          "Unified image asset loading paths (IMAGE_BASE) and switched to CDN deployment, separating dev/production configuration",
+          "Added simulation engine: SimPanel control panel, SimStatsPanel stats panel, and SimBridge bridge layer supporting start/stop/step/reset and real-time rate stats",
+          "Added global running-state control; keyboard input is blocked while the simulation is running to prevent accidental edits",
+          "Simulation panel speed control switched to preset gears (5/10/20/40/50 ticks/s), consistent with the rate stats",
+          "Added a machine mask visualization system that shows machine running state in real time",
+          "Upgraded t2industry-sim-engine to 1.0.2-b4 and improved numeric display precision",
+          "Integrated sparkline-vue: per-item produced (green) / consumed (red) dual-series rate trend lines backed by sliding-window history",
+          "Fixed mask map not being cleaned up correctly when the simulation stops; state reset and cleanup are now handled uniformly by reset",
+        ],
+      },
+      {
         version: "0.1.2",
         date: "2026-08-20",
         notes: [
