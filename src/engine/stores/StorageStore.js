@@ -6,17 +6,24 @@ export const useStorageStore = defineStore(
   () => {
     // 场景配置
     const width = ref(1600);
-    const height = ref(780);
+    const height = ref(800);
     const gridLineColor = ref("white");
     const backgroundColor = ref("#A3A3A3");
     const backgroundAlpha = ref(0.5);
     const rowCount = ref(50);
     const colCount = ref(50);
-    const cellWidth = computed(
-      () => Math.min(width.value, height.value) / colCount.value,
+    const cellWidth = computed(() =>
+      Math.max(
+        1,
+        Math.floor(Math.min(width.value, height.value) / colCount.value),
+      ),
     );
-    const cellHeight = computed(
-      () => Math.min(width.value, height.value) / rowCount.value,
+
+    const cellHeight = computed(() =>
+      Math.max(
+        1,
+        Math.floor(Math.min(width.value, height.value) / rowCount.value),
+      ),
     );
     // 缩放比例以及偏移量
     const scale = ref(1);
@@ -82,9 +89,8 @@ export const useStorageStore = defineStore(
       rowCount.value = size;
       colCount.value = size;
       const makeGrid = () =>
-        Array.from(
-          { length: size },
-          () => Array.from({ length: size }).fill(null),
+        Array.from({ length: size }, () =>
+          Array.from({ length: size }).fill(null),
         );
       machineLocations.value = makeGrid();
       beltLocations.value = makeGrid();

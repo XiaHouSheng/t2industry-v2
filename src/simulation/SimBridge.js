@@ -149,6 +149,9 @@ function prepare() {
     runtime = createSimulation({
       blueprint,
       recipes,
+      stage: {
+        cell_size: useStorageStore().cellWidth,
+      },
       intervalMs: Math.max(16, params.value.intervalMs),
       reportEveryTicks: params.value.reportEveryTicks,
       gameSecPerTick: params.value.gameSecPerTick,
@@ -162,8 +165,6 @@ function prepare() {
         applySnapshot(snap);
       },
       onUpdate(snap) {
-        //console.log("[SimBridge] onUpdate tick=", snap.tick);
-        //console.log(snap);
         updateMask(snap);
         applySnapshot(snap);
       },

@@ -152,6 +152,15 @@ export default {
     close: "Got it",
     logs: [
       {
+        version: "0.1.4",
+        date: "2026-08-25",
+        notes: [
+          "Fixed machine position offset after rotation when grid size is 30 (grid-coordinate calc now rounds to eliminate float precision errors)",
+          "Fixed persistent indicators not being rebuilt correctly when switching blueprints",
+          "Simulation engine cell size is now injected dynamically from the editor (consistent with the client grid) instead of a fixed value of 26",
+        ],
+      },
+      {
         version: "0.1.3",
         date: "2026-08-22",
         notes: [
