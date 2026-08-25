@@ -11,6 +11,10 @@ import {
   resolveMachineMaskData,
   getMachineMaskConfig,
 } from "../core_middleware/MachineMaskUtil.js";
+import { getBlueprintSize } from "./BlueprintSize.js";
+import { backgroundContainer } from "../core_stage/SimStage.js";
+import { drawGridLines } from "../core_stage/SimInit.js";
+import { refreshPersistentIndicator } from "../core_middleware/IndicatorState.js";
 
 /**
  * 当前应用/配置版本：由 vite-plugin-version-mark 构建时注入全局
@@ -24,8 +28,22 @@ function getCurrentVersion() {
   }
 }
 
+function applyBlueprintGridSize(size) {
+  const storageStore = useStorageStore();
+  storageStore.setGridSize(size);
+  // 清空旧网格线图层后按最新行列数重绘
+  backgroundContainer.removeChildren();
+  drawGridLines();
+  // 单元格大小变化后，重建持久化的放置/选择指示器
+  refreshPersistentIndicator();
+}
+
 export function renderBlueprint(blueprint) {
   if (!blueprint || !blueprint.content) return;
+  // 按蓝图 size 适配地图网格：归一化尺寸后交给 applyBlueprintGridSize
+  blueprint.size = getBlueprintSize(blueprint);
+  applyBlueprintGridSize(blueprint.size);
+
   const { machines = {}, belts = {}, pipes = {} } = blueprint.content;
   const currentVersion = getCurrentVersion();
   const needRebuild = !!currentVersion && blueprint.version !== currentVersion;

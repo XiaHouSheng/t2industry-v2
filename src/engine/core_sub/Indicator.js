@@ -48,6 +48,7 @@ import {
   initIndicator,
   placeIndicatorHandle,
   refreshIndicator,
+  refreshPersistentIndicator,
   refreshSelectIndicator,
   refreshConflictIndicator,
   refreshIndicatorPosition,
@@ -894,3 +895,4 @@ export {
 };
 export { onMouseMove, onMouseDown, onMouseUp, onMouseOut, onMouseOver };
 export { initIndicator };
+export { refreshPersistentIndicator };

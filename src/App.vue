@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import EditorShell from "@/components/editor/EditorShell.vue";
 import UpdateLogModal from "@/components/common/UpdateLogModal.vue";
+import Toast from "@/components/common/Toast.vue";
 
 const { tm } = useI18n();
 
@@ -57,4 +58,5 @@ function closeUpdateLog() {
     :logs="logs"
     @close="closeUpdateLog"
   />
+  <Toast />
 </template>

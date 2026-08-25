@@ -7,7 +7,7 @@
  * 图标使用 icons.webp 精灵图（SpriteIcon），配方/端口变更全部经由引擎门面 api.js：
  *  setNowRecipe / setPortRecipeIcon / getPortRecipeIcon / getMachineObject。
  */
-import { computed, ref, onMounted, onUnmounted } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import {
   useResourcesStore,
@@ -23,9 +23,11 @@ import {
   IMAGE_BASE,
 } from "@/engine/plugin/api.js";
 import SpriteIcon from "./SpriteIcon.vue";
+import BaseDialog from "@/components/common/BaseDialog.vue";
 
 const props = defineProps({
   machine: { type: Object, required: true },
+  visible: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["close"]);
@@ -269,22 +271,15 @@ function applyRecipe(recipeId) {
   getMachineObject(machine.id)?.refreshRecipeUI?.();
 }
 
-/* ---------- 关闭（Esc / 遮罩） ---------- */
+/* ---------- 关闭（Esc / 遮罩 由 BaseDialog 承担） ---------- */
 
 function close() {
   emit("close");
 }
-
-function onKeydown(e) {
-  if (e.key === "Escape") close();
-}
-
-onMounted(() => window.addEventListener("keydown", onKeydown));
-onUnmounted(() => window.removeEventListener("keydown", onKeydown));
 </script>
 
 <template>
-  <div class="modal-mask" @click.self="close">
+  <BaseDialog :visible="visible" :width="'780px'" @close="close">
     <div class="recipe-modal">
       <!-- 左列：信息 + 当前配方 + 端口配置 -->
       <aside class="left">
@@ -484,21 +479,10 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
         </div>
       </section>
     </div>
-  </div>
+  </BaseDialog>
 </template>
 
 <style scoped>
-.modal-mask {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(2px);
-}
-
 .recipe-modal {
   display: flex;
   width: 780px;

@@ -81,6 +81,27 @@ function refreshIndicator() {
   S.indicatorGraphics = [];
 }
 
+/**
+ * 蓝图切换后，单元格大小可能变化。
+ * 重建持久化的放置/选择指示器，使其以最新的单元格几何渲染（保留显隐/透明度）。
+ */
+function refreshPersistentIndicator() {
+  if (S.placeIndicator) {
+    const visible = S.placeIndicator.visible;
+    const alpha = S.placeIndicator.alpha;
+    S.placeIndicator.destroy();
+    S.placeIndicator = drawMask({ gridX: 1, gridY: 1 });
+    S.placeIndicator.visible = visible;
+    S.placeIndicator.alpha = alpha;
+  }
+  if (S.selectIndicator) {
+    const visible = S.selectIndicator.visible;
+    S.selectIndicator.destroy();
+    S.selectIndicator = drawSelectBox();
+    S.selectIndicator.visible = visible;
+  }
+}
+
 function refreshSelectIndicator() {
   Object.values(S.selectGraphics).forEach((kind) => {
     Object.values(kind).forEach((item) => item.destroy());
@@ -281,6 +302,7 @@ export {
   initIndicator,
   placeIndicatorHandle,
   refreshIndicator,
+  refreshPersistentIndicator,
   refreshSelectIndicator,
   refreshConflictIndicator,
   refreshIndicatorPosition,

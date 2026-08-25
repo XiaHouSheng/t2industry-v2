@@ -88,8 +88,8 @@ onUnmounted(() => setMachineClickHandler(null));
     </div>
     <StatusBar />
     <RecipeModal
-      v-if="recipeMachine"
       :machine="recipeMachine"
+      :visible="!!recipeMachine"
       @close="recipeMachine = null"
     />
   </div>

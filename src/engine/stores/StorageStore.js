@@ -6,7 +6,7 @@ export const useStorageStore = defineStore(
   () => {
     // 场景配置
     const width = ref(1600);
-    const height = ref(800);
+    const height = ref(780);
     const gridLineColor = ref("white");
     const backgroundColor = ref("#A3A3A3");
     const backgroundAlpha = ref(0.5);
@@ -77,6 +77,21 @@ export const useStorageStore = defineStore(
       ),
     ); // [x][y] -> id
 
+    function setGridSize(n) {
+      const size = Math.max(1, Math.round(Number(n)) || 50);
+      rowCount.value = size;
+      colCount.value = size;
+      const makeGrid = () =>
+        Array.from(
+          { length: size },
+          () => Array.from({ length: size }).fill(null),
+        );
+      machineLocations.value = makeGrid();
+      beltLocations.value = makeGrid();
+      pipeLocations.value = makeGrid();
+      return size;
+    }
+
     return {
       width,
       height,
@@ -96,6 +111,7 @@ export const useStorageStore = defineStore(
       gridLineColor,
       rowCount,
       colCount,
+      setGridSize,
       machines,
       machineObjects,
       machineLocations,

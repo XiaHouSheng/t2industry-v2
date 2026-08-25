@@ -1,6 +1,7 @@
 import { useStorageStore } from "../stores/StorageStore.js";
 import { renderBlueprint, clearBlueprint } from "./BlueprintStage.js";
 import { nanoid } from "nanoid";
+import { getBlueprintSize } from "./BlueprintSize.js";
 
 let callbackOnInit, callbackOnSelectBlueprint;
 
@@ -12,11 +13,12 @@ function setBlueprintCallbacks(
   callbackOnSelectBlueprint = onSelectBlueprint;
 }
 
-function createBlueprint(name, id, content, version = null) {
+function createBlueprint(name, id, content, version = null, size = 50) {
   return {
     name,
     id: id || nanoid(),
     version,
+    size,
     content: content || {
       machines: {},
       belts: {},
@@ -149,6 +151,8 @@ function importBlueprintFromData(data) {
       belts: cloneContent(belts),
       pipes: cloneContent(pipes),
     },
+    undefined,
+    getBlueprintSize(data),
   );
   storageStore.blueprints[blueprint.id] = blueprint;
   // 切换并渲染导入的蓝图
@@ -174,10 +178,10 @@ function exportBlueprintToFile() {
   URL.revokeObjectURL(url);
 }
 
-function addBlueprintLocal(name) {
+function addBlueprintLocal(name, size) {
   const storageStore = useStorageStore();
   if (!name || name.trim() === "") return;
-  const blueprint = createBlueprint(name);
+  const blueprint = createBlueprint(name, undefined, undefined, undefined, size);
   storageStore.blueprints[blueprint.id] = blueprint;
   selectBlueprintLocal(blueprint.id);
 }

@@ -226,8 +226,21 @@ const { t } = useI18n();
   transition: opacity 0.18s ease;
 }
 
+.vm-fade-enter-active .update-log-modal,
+.vm-fade-leave-active .update-log-modal {
+  transition: transform 0.18s ease;
+}
+
 .vm-fade-enter-from,
 .vm-fade-leave-to {
   opacity: 0;
+}
+
+.vm-fade-enter-from .update-log-modal {
+  transform: scale(0.95);
+}
+
+.vm-fade-leave-to .update-log-modal {
+  transform: scale(0.97);
 }
 </style>

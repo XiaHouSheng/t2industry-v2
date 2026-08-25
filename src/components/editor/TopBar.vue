@@ -5,7 +5,7 @@
  * 中部：放置工具（选择/传送带/管道）；
  * 右侧：蓝图文件操作与视图控制。全部经由引擎门面 api.js 调用。
  */
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, nextTick, watch, onMounted, onUnmounted } from "vue";
 import { useI18n } from "vue-i18n";
 import {
   useStorageStore,
@@ -28,14 +28,19 @@ import {
   TOOL_PIPE,
 } from "@/stores/EditorStore.js";
 import { setLocale } from "@/i18n/index.js";
+import BaseDialog from "@/components/common/BaseDialog.vue";
+import { useToast } from "@/components/common/useToast.js";
 
 const { t, locale } = useI18n();
 const storageStore = useStorageStore();
 const editorStore = useEditorStore();
+const { toast } = useToast();
 
 const currentBlueprint = computed(
   () => storageStore.blueprints[storageStore.current_blueprint] || null,
 );
+
+const currentSize = computed(() => currentBlueprint.value?.size || 50);
 
 const blueprintList = computed(() => Object.values(storageStore.blueprints));
 
@@ -51,38 +56,102 @@ function closeBp() {
   bpOpen.value = false;
 }
 
+/* ---------- 当前蓝图名走马灯（超出按钮宽度时滚动展示） ---------- */
+
+const nameWrap = ref(null); // .bp-name 容器
+const nameInner = ref(null); // 内部文本
+const nameMarquee = ref(false);
+const nameShift = ref(0); // 溢出距离(px)，作为 CSS 变量驱动动画
+
+function updateNameMarquee() {
+  nextTick(() => {
+    const wrap = nameWrap.value;
+    const inner = nameInner.value;
+    if (!wrap || !inner) return;
+    const dist = inner.scrollWidth - wrap.clientWidth;
+    nameMarquee.value = dist > 0;
+    nameShift.value = dist;
+  });
+}
+
+watch(() => currentBlueprint.value?.name, updateNameMarquee);
+onMounted(updateNameMarquee);
+
 function onSelectBp(id) {
   selectBlueprintLocal(id);
   closeBp();
 }
 
-function onNewBlueprint() {
-  const name = window.prompt(t("topbar.newBlueprintPrompt"), t("topbar.newBlueprintDefault"));
-  if (name && name.trim()) {
-    addBlueprintLocal(name.trim());
-    closeBp();
+/* 蓝图操作模态框状态与逻辑 */
+const dialog = ref(null); // { kind: 'new'|'rename'|'delete'|'clear', target?: bp } | null
+const dialogValue = ref("");
+const dialogSize = ref(50);
+
+const dialogCfg = computed(() => {
+  const d = dialog.value;
+  if (!d) return null;
+  if (d.kind === "new") {
+    return { title: t("dialog.titleNew"), prompt: t("dialog.promptName"), size: true };
   }
+  if (d.kind === "rename") {
+    return { title: t("dialog.titleRename"), prompt: t("dialog.promptName"), size: false };
+  }
+  if (d.kind === "delete") {
+    return {
+      title: t("dialog.titleDelete"),
+      text:
+        blueprintList.value.length > 1
+          ? t("dialog.textDelete", { name: d.target.name })
+          : t("dialog.textDeleteLast"),
+      danger: true,
+    };
+  }
+  if (d.kind === "clear") {
+    return { title: t("dialog.titleClear"), text: t("dialog.textClear"), danger: true };
+  }
+  return null;
+});
+
+function onNewBlueprint() {
+  dialog.value = { kind: "new" };
+  dialogValue.value = "";
+  dialogSize.value = 50;
+  closeBp();
 }
 
 function onRenameBp(bp) {
-  const name = window.prompt(
-    t("topbar.renameBlueprintPrompt", { name: bp.name }),
-    bp.name,
-  );
-  if (name && name.trim()) {
-    changeBlueprintNameLocal(bp.id, name.trim());
-  }
+  dialog.value = { kind: "rename", target: bp };
+  dialogValue.value = bp.name;
 }
 
 function onDeleteBp(bp) {
-  const hint =
-    blueprintList.value.length > 1
-      ? t("topbar.deleteConfirm", { name: bp.name })
-      : t("topbar.deleteLastConfirm");
-  if (window.confirm(hint)) {
-    deleteBlueprintLocal(bp.id);
-    closeBp();
+  dialog.value = { kind: "delete", target: bp };
+  closeBp();
+}
+
+function closeDialog() {
+  dialog.value = null;
+}
+
+function confirmDialog() {
+  const d = dialog.value;
+  if (!d) return;
+  if (d.kind === "new" || d.kind === "rename") {
+    const name = dialogValue.value.trim();
+    if (!name) return;
+    if (d.kind === "new") {
+      const size = Math.max(1, Math.round(Number(dialogSize.value) || 50));
+      addBlueprintLocal(name, size);
+    } else {
+      changeBlueprintNameLocal(d.target.id, name);
+    }
+  } else if (d.kind === "delete") {
+    deleteBlueprintLocal(d.target.id);
+  } else if (d.kind === "clear") {
+    clearBlueprintLocal();
   }
+  closeDialog();
+  closeBp();
 }
 
 /* 点击外部关闭下拉 */
@@ -114,7 +183,13 @@ function pickTool(tool) {
 /* ---------- 蓝图操作 ---------- */
 
 function onClearBlueprint() {
-  if (window.confirm(t("topbar.clearConfirm"))) clearBlueprintLocal();
+  dialog.value = { kind: "clear" };
+  closeBp();
+}
+
+function onSave() {
+  saveBlueprintLocal();
+  toast(t("toast.saveSuccess"), "success");
 }
 
 function onResetView() {
@@ -144,7 +219,17 @@ function toggleLang() {
     <div class="bp-drop" @click.stop>
       <button class="bp-trigger" @click="toggleBp">
         <span class="bp-label">{{ t("topbar.blueprint") }}</span>
-        <span class="bp-name">{{ currentBlueprint?.name || "未命名" }}</span>
+        <span
+          ref="nameWrap"
+          class="bp-name"
+          :class="{ marquee: nameMarquee }"
+          :style="{ '--bp-shift': nameShift + 'px' }"
+        >
+          <span ref="nameInner" class="bp-name-inner">
+            {{ currentBlueprint?.name || "未命名" }}
+          </span>
+        </span>
+        <span class="bp-size">{{ t("topbar.size") }} {{ currentSize }}</span>
         <svg
           class="bp-chevron"
           :class="{ open: bpOpen }"
@@ -156,7 +241,8 @@ function toggleLang() {
         </svg>
       </button>
 
-      <div v-show="bpOpen" class="bp-menu">
+      <Transition name="bp">
+        <div v-show="bpOpen" class="bp-menu">
         <div
           v-for="bp in blueprintList"
           :key="bp.id"
@@ -188,7 +274,8 @@ function toggleLang() {
             + {{ t("topbar.newBlueprint") }}
           </button>
         </div>
-      </div>
+        </div>
+      </Transition>
     </div>
 
     <div class="tools">
@@ -213,7 +300,7 @@ function toggleLang() {
       >
         {{ locale === "zh-CN" ? "EN" : "中文" }}
       </button>
-      <button class="ui-btn" title="Ctrl+S" @click="saveBlueprintLocal()">
+      <button class="ui-btn" title="Ctrl+S" @click="onSave">
         {{ t("topbar.save") }}
       </button>
       <button class="ui-btn" @click="onClearBlueprint()">
@@ -257,6 +344,53 @@ function toggleLang() {
       </a>
     </div>
   </header>
+
+  <!-- 蓝图操作模态框（新增/改名/删除/清空） -->
+  <BaseDialog :visible="!!dialog" @close="closeDialog">
+    <div v-if="dialogCfg" class="dlg">
+      <header class="dlg-head">
+        <span class="dlg-title">{{ dialogCfg.title }}</span>
+        <button class="dlg-close" :title="t('common.close')" @click="closeDialog">
+          ×
+        </button>
+      </header>
+
+      <div class="dlg-body">
+        <template v-if="dialogCfg.prompt">
+          <input
+            v-model="dialogValue"
+            class="dlg-input"
+            :placeholder="dialogCfg.prompt"
+            @keyup.enter="confirmDialog"
+          />
+          <label v-if="dialogCfg.size" class="dlg-size">
+            <span>{{ t("dialog.sizeLabel") }}</span>
+            <input
+              v-model.number="dialogSize"
+              type="number"
+              min="1"
+              class="dlg-input"
+              @keyup.enter="confirmDialog"
+            />
+          </label>
+        </template>
+        <p v-else-if="dialogCfg.text" class="dlg-text">{{ dialogCfg.text }}</p>
+      </div>
+
+      <footer class="dlg-foot">
+        <button class="ui-btn" @click="closeDialog">
+          {{ t("common.cancel") }}
+        </button>
+        <button
+          class="ui-btn dlg-ok"
+          :class="{ 'dlg-danger': dialogCfg.danger }"
+          @click="confirmDialog"
+        >
+          {{ t("common.confirm") }}
+        </button>
+      </footer>
+    </div>
+  </BaseDialog>
 </template>
 
 <style scoped>
@@ -301,6 +435,9 @@ function toggleLang() {
   display: flex;
   align-items: center;
   gap: 6px;
+  width: 230px;
+  max-width: 230px;
+  box-sizing: border-box;
   padding: 5px 10px;
   background: var(--bg-2);
   border: 1px solid var(--border);
@@ -316,18 +453,49 @@ function toggleLang() {
 }
 
 .bp-label {
+  flex: none;
   font-size: 11px;
   color: var(--text-faint);
 }
 
 .bp-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
   font-size: 12px;
   color: var(--accent);
   font-weight: 600;
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 走马灯：内部文本超出容器宽度时循环平移 */
+.bp-name-inner {
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.bp-name.marquee .bp-name-inner {
+  animation: bp-marquee 6s linear infinite;
+  animation-delay: 1.2s;
+}
+
+@keyframes bp-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  5% {
+    transform: translateX(0);
+  }
+  55% {
+    transform: translateX(calc(-1 * var(--bp-shift, 0px)));
+  }
+  95% {
+    transform: translateX(calc(-1 * var(--bp-shift, 0px)));
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .bp-chevron {
@@ -351,6 +519,19 @@ function toggleLang() {
   border-radius: 8px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(6px);
+  transform-origin: top left;
+}
+
+/* 下拉展开/收起动效 */
+.bp-enter-active,
+.bp-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.bp-enter-from,
+.bp-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.96);
 }
 
 .bp-item {
@@ -549,5 +730,136 @@ kbd {
 
 .gh-icon {
   flex: none;
+}
+
+/* ---------- 尺寸徽标（只读） ---------- */
+
+.bp-size {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+/* ---------- 蓝图操作对话框 ---------- */
+
+.dlg {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dlg-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.dlg-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dlg-close {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.dlg-close:hover {
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+.dlg-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+}
+
+.dlg-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  background: var(--bg-0);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.dlg-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.dlg-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.dlg-size .dlg-input {
+  width: 100px;
+}
+
+.dlg-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+
+.dlg-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--bg-2);
+  border-top: 1px solid var(--border);
+}
+
+.dlg-ok {
+  padding: 6px 20px;
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.dlg-ok:hover {
+  background: var(--accent);
+  border-color: var(--accent-strong);
+  color: #1a1a1a;
+}
+
+.dlg-ok.dlg-danger {
+  background: rgba(226, 109, 92, 0.14);
+  border-color: var(--danger);
+  color: #ff9d8f;
+}
+
+.dlg-ok.dlg-danger:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #1a1a1a;
 }
 </style>

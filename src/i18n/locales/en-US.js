@@ -7,6 +7,8 @@ export default {
     current: "Current",
     input: "Input",
     output: "Output",
+    cancel: "Cancel",
+    confirm: "Confirm",
   },
   tools: {
     select: "Select",
@@ -37,10 +39,26 @@ export default {
     export: "Export",
     resetView: "Reset View",
     clearConfirm: "Clear the current blueprint?",
+    size: "Size",
     lang: "Switch language",
     githubV2: "T2industry v2 repository",
     coreEngine: "T2EngineCore",
     githubEngine: "T2EngineCore core engine repository",
+  },
+  dialog: {
+    titleNew: "New Blueprint",
+    titleRename: "Rename Blueprint",
+    titleDelete: "Delete Blueprint",
+    titleClear: "Clear Blueprint",
+    promptName: "Enter blueprint name",
+    sizeLabel: "Size",
+    textDelete: "Delete blueprint 「{name}」?",
+    textDeleteLast:
+      "This is the last blueprint and cannot be deleted; its content will be cleared.",
+    textClear: "Clear the current blueprint?",
+  },
+  toast: {
+    saveSuccess: "Saved successfully",
   },
   placebar: {
     categoryDefault: "Default",

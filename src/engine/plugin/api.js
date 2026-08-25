@@ -151,5 +151,5 @@ export { IMAGE_BASE } from "../core_loader/LoadConfigs.js";
 export { app } from "../core_stage/SimStage.js";
 export { drawGridLines, drawHitArea } from "../core_stage/SimInit.js";
 export { resetPosition, resetScale } from "../core_stage/ScaleStage.js";
-export { initIndicator } from "../core_sub/Indicator.js";
+export { initIndicator, refreshPersistentIndicator } from "../core_sub/Indicator.js";
 
