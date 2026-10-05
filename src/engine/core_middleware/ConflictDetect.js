@@ -12,6 +12,20 @@ import { pixelToGridNoneOffset } from "./PositionConvert.js";
 import { parseMaskCell } from "./MaskUtil.js";
 import { getMaskForType } from "./MachineMaskUtil.js";
 
+// 允许 pipe 与其重叠的机器类型白名单：
+// 存取线源段、存储线基段、仓库取货口、仓库存货口
+const PIPE_OVERLAP_MACHINE_TYPES = new Set([
+  "source_pile_1",
+  "base_segment_1",
+  "warehouse_output_1",
+  "warehouse_input_1",
+]);
+
+// 该机器是否允许与 pipe 重叠
+function isPipeOverlapMachine(machine) {
+  return !!machine && PIPE_OVERLAP_MACHINE_TYPES.has(machine.type);
+}
+
 function detectOnPlaceMachine(grid_x, grid_y, machineType, usePreMachine) {
   const metaConflict = {
     machines: {},
@@ -55,7 +69,10 @@ function detectOnPlaceMachine(grid_x, grid_y, machineType, usePreMachine) {
     const pipe = getPipeByPosition(gx, gy);
     if (machine) metaConflict.machines[machine.id] = machine;
     if (belt) metaConflict.belts[belt.id] = belt;
-    if (pipe) metaConflict.pipes[pipe.id] = pipe;
+    // 白名单机器允许与 pipe 重叠，不判定 pipe 冲突
+    if (pipe && !PIPE_OVERLAP_MACHINE_TYPES.has(machineType)) {
+      metaConflict.pipes[pipe.id] = pipe;
+    }
   });
 
   return metaConflict;
@@ -177,7 +194,8 @@ function detectOnMoveMask(metaRotateMove, gridDeltaX, gridDeltaY) {
         if (belt) {
           metaConflict.belts[belt.id] = belt;
         }
-        if (pipe) {
+        // 白名单机器允许与 pipe 重叠，不判定 pipe 冲突
+        if (pipe && !isPipeOverlapMachine(machine)) {
           metaConflict.pipes[pipe.id] = pipe;
         }
         if (newX < 1 || newX > colCount) {
@@ -219,7 +237,8 @@ function detectOnMoveMask(metaRotateMove, gridDeltaX, gridDeltaY) {
     const machine = getMachineByPosition(newX, newY);
     const belt_ = getBeltByPosition(newX, newY);
     const pipe_ = getPipeByPosition(newX, newY);
-    if (machine) {
+    // 白名单机器允许与 pipe 重叠，不判定 machine 冲突
+    if (machine && !isPipeOverlapMachine(machine)) {
       metaConflict.machines[machine.id] = machine;
     }
     // 移动 pipe 撞上特殊 belt 节点 → 冲突（default 直线 belt 允许交叉）
@@ -329,7 +348,8 @@ function detectOnPlaceBatch(
     const machine = getMachineByPosition(graphic.gridX, graphic.gridY);
     const belt_ = getBeltByPosition(graphic.gridX, graphic.gridY);
     const pipe_ = getPipeByPosition(graphic.gridX, graphic.gridY);
-    if (machine) {
+    // 放置 pipe 时，白名单机器（仓储线/仓库口）允许与 pipe 重叠，直接放行
+    if (machine && (is_belt || !isPipeOverlapMachine(machine))) {
       const maskTypeRaw = getMachineMaskTypeByPosition(
         graphic.gridX,
         graphic.gridY,
@@ -438,9 +458,9 @@ function detectOnPlaceBatch(
 function detectOnPlaceNode(gridX, gridY, is_belt = true) {
   const metaConflict = { machines: {}, belts: {}, pipes: {} };
 
-  // 机器占据该格 → 冲突
+  // 机器占据该格 → 冲突（放置 pipe 时白名单机器允许与 pipe 重叠）
   const machine = getMachineByPosition(gridX, gridY);
-  if (machine) {
+  if (machine && (is_belt || !isPipeOverlapMachine(machine))) {
     metaConflict.machines[machine.id] = machine;
   }
 

@@ -152,6 +152,13 @@ export default {
     close: "Got it",
     logs: [
       {
+        version: "0.1.4b1",
+        date: "2026-10-05",
+        notes: [
+          "Added a pipe-overlap whitelist: pipes may now pass through/overlap the source pile, base segment, warehouse pickup port and warehouse stock port (allowed on both placement and move); belts are unchanged",
+        ],
+      },
+      {
         version: "0.1.4",
         date: "2026-08-25",
         notes: [
